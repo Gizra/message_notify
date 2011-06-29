@@ -26,7 +26,7 @@ function message_notify_install() {
   // Create the field holding the message email "subject", in our custom bundle.
   $field = array(
     'field_name' => 'message_text_subject',
-    'type' => 'text_long',
+    'type' => 'text',
     'entity_types' => array('message_type'),
     'cardinality' => 1,
     'translatable' => TRUE,
