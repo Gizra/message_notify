@@ -1,0 +1,5 @@
+name = Message notify
+description = "Message notify."
+core = 7.x
+package = Message
+dependencies[] = message

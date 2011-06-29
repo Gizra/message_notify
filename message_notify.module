@@ -1,0 +1,44 @@
+<?php
+
+/**
+ * @file
+ * Message notify.
+ */
+
+/**
+ * Implements hook_default_message_type_category().
+ */
+function message_notify_default_message_type_category() {
+  $items = array();
+  $items['message_type_email'] = entity_import('message_type_category', '{
+    "category" : "message_type_email",
+    "description" : "Message type email",
+    "statusKey" : "status",
+    "rdf_mapping" : []
+  }');
+  return $items;
+}
+
+/**
+ * Implementation of hook_default_message_type().
+ */
+function message_notify_default_message_type() {
+  $items = array();
+  $items['email_comment'] = entity_import('message_type', '{
+    "name" : "email_comment",
+    "category" : "message_type_email",
+    "description" : "Email content",
+    "statusKey" : "status",
+    "argument_keys" : [ "@url @title" ],
+    "message_text" : { "und" : [
+        {
+          "value" : "created \u003ca href=\"@url\"\u003e@title\u003c\/a\u003e",
+          "format" : "filtered_html",
+          "safe_value" : "\u003cp\u003ecreated \u003ca href=\"@url\"\u003e@title\u003c\/a\u003e\u003c\/p\u003e\n"
+        }
+      ]
+    },
+    "rdf_mapping" : []
+  }');
+  return $items;
+}

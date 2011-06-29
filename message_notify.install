@@ -1,0 +1,49 @@
+<?php
+
+/**
+ * @file
+ * Install, update, and uninstall functions for the message notify module.
+ */
+
+/**
+ * Implements hook_install().
+ */
+function message_notify_install() {
+  // Create instance of the message text in our custom bundle.
+  $instance = array(
+    'field_name' => MESSAGE_FIELD_MESSAGE_TEXT,
+    'bundle' => 'message_type_email',
+    'entity_type' => 'message_type',
+    'label' => t('Message email body'),
+    'description' => t('This is the body of the email.'),
+    'required' => TRUE,
+    'settings' => array(
+      'text_processing' => 1,
+    ),
+  );
+  field_create_instance($instance);
+
+  // Create the field holding the message email "subject", in our custom bundle.
+  $field = array(
+    'field_name' => 'message_text_subject',
+    'type' => 'text_long',
+    'entity_types' => array('message_type'),
+    'cardinality' => 1,
+    'translatable' => TRUE,
+    'locked' => TRUE,
+  );
+  $field = field_create_field($field);
+
+  $instance = array(
+    'field_name' => 'message_text_subject',
+    'bundle' => 'message_type_email',
+    'entity_type' => 'message_type',
+    'label' => t('Message email subject'),
+    'description' => t('This is the subject of the email.'),
+    'required' => TRUE,
+    'settings' => array(
+      'text_processing' => 1,
+    ),
+  );
+  field_create_instance($instance);
+}
