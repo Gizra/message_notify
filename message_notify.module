@@ -6,6 +6,16 @@
  */
 
 /**
+ * Implements hook_message_view().
+ */
+function message_notify_message_view($message, $view_mode, $langcode) {
+  $message->content['subject'] = array(
+    // Add the subject field.
+    '#markup' => $message->getText($langcode, array('field name' => 'message_text_subject')),
+  );
+}
+
+/**
  * Implements hook_default_message_type_category().
  */
 function message_notify_default_message_type_category() {
