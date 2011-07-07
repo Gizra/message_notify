@@ -9,10 +9,12 @@
  * Implements hook_message_view().
  */
 function message_notify_message_view($message, $view_mode, $langcode) {
-  $message->content['subject'] = array(
-    // Add the subject field.
-    '#markup' => $message->getText($langcode, array('field name' => 'message_text_subject')),
-  );
+  if ($message->getType()->category == 'message_type_email') {
+    $message->content['subject'] = array(
+      // Add the subject field.
+      '#markup' => $message->getText($langcode, array('field name' => 'message_text_subject')),
+    );
+  }
 }
 
 /**
