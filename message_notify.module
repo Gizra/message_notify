@@ -18,13 +18,188 @@ function message_notify_message_view($message, $view_mode, $langcode) {
 }
 
 /**
+ * Implements hook_cron().
+ *
+ * Get up to 10 messages that need be processed.
+ */
+function message_notify_cron() {
+  // Get all the message types that belong to "Message type notify" category.
+  $message_types = array();
+  foreach (entity_load_multiple_by_name('message_type') as $message_type) {
+    if ($message_type->category == 'message_type_notify') {
+      $message_types[] = $message_type->name;
+    }
+  }
+  if (!$message_types) {
+    return;
+  }
+
+  $query = new EntityFieldQuery();
+  $result = $query
+    ->entityCondition('entity_type', 'message')
+    ->propertyCondition('name', $message_types, 'IN')
+    ->propertyOrderBy('mid')
+    ->range(0, 10)
+    ->execute();
+
+  if (empty($result['message'])) {
+    return;
+  }
+
+  $messages = message_load_multiple(array_keys($result['message']));
+  foreach ($messages as $message) {
+    message_notify_process_message($message);
+  }
+}
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function message_notify_ctools_plugin_directory($module, $type) {
+  if ($module == 'message_notify') {
+    return 'plugins/message_notify';
+  }
+}
+
+/**
+ * Implements hook_ctools_plugin_type().
+ */
+function message_notify_ctools_plugin_type() {
+  return array(
+    'message_notify' => array(
+      'process' => 'message_notify_plugin_process',
+    ),
+  );
+}
+
+/**
+ * CTools callback; Process the message notify plugins.
+ */
+function message_notify_plugin_process(&$plugin, $info) {
+  $base = $plugin['plugin module'] . '_' . $plugin['name'];
+  $plugin += array(
+    'description' => '',
+    'presave callback' => FALSE,
+    'process callback' => $base . '_process',
+  );
+}
+
+/**
+ * Get a certain message notify plugin.
+ *
+ * @param $plugin_name
+ *   The plugin name.
+ */
+function message_notify_get_plugin($plugin_name) {
+  ctools_include('plugins');
+  return ctools_get_plugins('message_notify', 'message_notify', $plugin_name);
+}
+
+/**
+ * Get all message notify plugins.
+ */
+function message_notify_get_plugins() {
+  ctools_include('plugins');
+  return ctools_get_plugins('message_notify', 'message_notify');
+}
+
+/**
+ * Get all message notify plugins ready to be used in a select form.
+ */
+function message_notify_get_plugins_options() {
+  $options = array();
+  foreach (message_notify_get_plugins() as $plugin_name => $plugin) {
+    $options[$plugin_name] = check_plain($plugin['name']);
+  }
+  return $options;
+
+}
+
+/**
+ * Main entry point for saving (if needed) and processing a message.
+ *
+ * @param $message
+ *   Message type entity. If the entity is unsaved the correct plugin's
+ *   "presave" function is called.
+ */
+function message_notify_process_message(Message $message) {
+  // Get the plugin from the message.
+  $wrapper = entity_metadata_wrapper('message', $message);
+  $plugin_name = $wrapper->name->message_notify_plugin->value();
+  $plugin = message_notify_get_plugin($plugin_name);
+
+  if (!empty($message->is_new) && $func = ctools_plugin_get_function($plugin, 'presave callback')) {
+    $func($message);
+  }
+
+  if (!empty($message->is_new) && empty($message->skip_save)) {
+    $message->save();
+  }
+
+  $processed = FALSE;
+  if (empty($message->skip_process)) {
+    $func = ctools_plugin_get_function($plugin, 'process callback');
+    $processed = $func($message);
+  }
+
+  if (empty($message->is_new) && ($processed || !empty($message->force_delete))) {
+    // Message was processed, so we can delete it.
+    $message->delete();
+    // Return nothing.
+    return;
+  }
+  return $message;
+}
+
+/**
+ * General implementation for sending an email.
+ */
+function message_notify_send_email(Message $message) {
+  $element = $message->buildContent();
+  $account = user_load($message->uid);
+
+  if (empty($account)) {
+    // The user isn't available, so make sure this message is deleted.
+    $message->force_delete = TRUE;
+    return FALSE;
+  }
+
+  $to = $account->mail;
+
+  $params = array(
+    'subject' => drupal_render($element['subject']),
+    'body' => drupal_render($element['text']),
+  );
+  $key = 'message_notify_' . $message->name;
+  if (empty($message->is_new)) {
+    $key .= '_' . $message->mid;
+  }
+
+  $message = drupal_mail('message_notify', $key, $to, language_default(), $params);
+  if ($message['result']) {
+    watchdog('message_notify', 'Successfully sent email to %recipient', array('%recipient' => $to));
+  }
+  return $message['result'];
+}
+
+/**
+ * Implements hook_mail().
+ *
+ * Set's the message subject and body as configured.
+ */
+function message_notify_mail($key, &$message, $params) {
+  $message['subject'] = str_replace(array("\r", "\n"), '', $params['subject']);
+  $message['body'][] = $params['body'];
+}
+
+/**
  * Implements hook_default_message_type_category().
  */
 function message_notify_default_message_type_category() {
   $items = array();
-  $items['message_type_email'] = entity_import('message_type_category', '{
-    "category" : "message_type_email",
-    "description" : "Message type email",
+  $items['message_type_notify'] = entity_import('message_type_category', '{
+    "category" : "message_type_notify",
+    "description" : "Message type notify",
     "statusKey" : "status",
     "rdf_mapping" : []
   }');
@@ -36,9 +211,9 @@ function message_notify_default_message_type_category() {
  */
 function message_notify_default_message_type() {
   $items = array();
-  $items['email_comment'] = entity_import('message_type', '{
-    "name" : "email_comment",
-    "category" : "message_type_email",
+  $items['email_content'] = entity_import('message_type', '{
+    "name" : "email_content",
+    "category" : "message_type_notify",
     "description" : "Email content",
     "statusKey" : "status",
     "argument_keys" : [ "@url @title" ],
