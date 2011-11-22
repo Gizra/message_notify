@@ -40,7 +40,6 @@ function message_notify_mail($key, &$message, $params) {
   $message_entity = $params['message'];
   $element = $message_entity->buildContent();
 
-  // TODO: Subject should be plain text.
-  $message['subject'] = strip_tags(str_replace(array("\r", "\n"), '', drupal_render($element['subject'])));
+  $message['subject'] = str_replace(array("\r", "\n"), '', drupal_render($element['subject']));
   $message['body'][] = drupal_render($element['text']);
 }
