@@ -38,7 +38,7 @@ function message_notify_default_message_type_category() {
  */
 function message_notify_mail($key, &$message, $params) {
   $message_entity = $params['message'];
-  $element = $message_entity->buildContent();
+  $element = $message_entity->buildContent('full', $message['language']->language);
 
   $message['subject'] = str_replace(array("\r", "\n"), '', drupal_render($element['subject']));
   $message['body'][] = drupal_render($element['text']);
