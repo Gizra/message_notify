@@ -3,4 +3,3 @@ description = "Message notify."
 core = 7.x
 package = Message
 dependencies[] = message
-dependencies[] = ctools

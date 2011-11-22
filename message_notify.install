@@ -12,7 +12,7 @@ function message_notify_install() {
   // Create instance of the message text in our custom bundle.
   $instance = array(
     'field_name' => MESSAGE_FIELD_MESSAGE_TEXT,
-    'bundle' => 'message_type_notify',
+    'bundle' => 'message_type_email',
     'entity_type' => 'message_type',
     'label' => t('Message email body'),
     'description' => t('This is the body of the email.'),
@@ -36,7 +36,7 @@ function message_notify_install() {
 
   $instance = array(
     'field_name' => 'message_text_subject',
-    'bundle' => 'message_type_notify',
+    'bundle' => 'message_type_email',
     'entity_type' => 'message_type',
     'label' => t('Message email subject'),
     'description' => t('This is the subject of the email.'),
@@ -46,33 +46,4 @@ function message_notify_install() {
     ),
   );
   field_create_instance($instance);
-
-  // Create the field holding the message type plugin name.
-  $field = array(
-    'field_name' => 'message_notify_plugin',
-    'type' => 'list_text',
-    'entity_types' => array('message_type'),
-    'cardinality' => 1,
-    'translatable' => FALSE,
-    'locked' => TRUE,
-    'settings' => array(
-      'allowed_values' => array(),
-      'allowed_values_function' => 'message_notify_get_plugins_options',
-    ),
-  );
-  $field = field_create_field($field);
-
-  $instance = array(
-    'field_name' => 'message_notify_plugin',
-    'bundle' => 'message_type_notify',
-    'entity_type' => 'message_type',
-    'widget_type' => 'options_select',
-    'label' => t('Send method'),
-    'description' => t('This is the method of sending the message (e.g. immediate, daily digest).'),
-    'required' => TRUE,
-    'settings' => array(
-    ),
-  );
-  field_create_instance($instance);
-
 }
