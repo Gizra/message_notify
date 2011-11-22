@@ -32,25 +32,15 @@ function message_notify_default_message_type_category() {
 }
 
 /**
- * Implementation of hook_default_message_type().
+ * Implements hook_mail().
+ *
+ * Set's the message subject and body as configured.
  */
-function message_notify_default_message_type() {
-  $items = array();
-  $items['email_comment'] = entity_import('message_type', '{
-    "name" : "email_comment",
-    "category" : "message_type_email",
-    "description" : "Email content",
-    "statusKey" : "status",
-    "argument_keys" : [ "@url @title" ],
-    "message_text" : { "und" : [
-        {
-          "value" : "created \u003ca href=\"@url\"\u003e@title\u003c\/a\u003e",
-          "format" : "filtered_html",
-          "safe_value" : "\u003cp\u003ecreated \u003ca href=\"@url\"\u003e@title\u003c\/a\u003e\u003c\/p\u003e\n"
-        }
-      ]
-    },
-    "rdf_mapping" : []
-  }');
-  return $items;
+function message_notify_mail($key, &$message, $params) {
+  $message_entity = $params['message'];
+  $element = $message_entity->buildContent();
+
+  // TODO: Subject should be plain text.
+  $message['subject'] = strip_tags(str_replace(array("\r", "\n"), '', drupal_render($element['subject'])));
+  $message['body'][] = drupal_render($element['text']);
 }
