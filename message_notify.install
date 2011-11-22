@@ -41,9 +41,6 @@ function message_notify_install() {
     'label' => t('Message email subject'),
     'description' => t('This is the subject of the email.'),
     'required' => TRUE,
-    'settings' => array(
-      'text_processing' => 1,
-    ),
   );
   field_create_instance($instance);
 }
