@@ -1,0 +1,65 @@
+<?php
+/**
+ * @file
+ * Code for the Message notify example feature.
+ */
+
+include_once('message_notify_example.features.inc');
+
+/**
+ * Implements hook_comment_insert().
+ */
+function message_notify_example_comment_insert($comment) {
+  $wrapper = entity_metadata_wrapper('comment', $comment);
+  if ($wrapper->author->value() == $wrapper->node->author->value()) {
+    // The comment author is also the node author.
+    return;
+  }
+
+  $nid = $wrapper->node->getIdentifier();
+  $cid = $comment->cid;
+
+  $arguments = array (
+    '@node-title' => array(
+      'callback' => 'message_notify_example_entity_label',
+      'callback arguments' => array('node', $nid),
+    ),
+    '@node-url' => array(
+      'callback' => 'url',
+      'callback arguments' => array("node/$nid"),
+    ),
+    '@user' => array(
+      'callback' => 'message_notify_example_entity_label',
+      'callback arguments' => array('user', $wrapper->node->author->getIdentifier()),
+    ),
+    '@comment-author' => array(
+      'callback' => 'message_notify_example_entity_label',
+      'callback arguments' => array('user', $comment->uid),
+    ),
+    '@comment-url' => array(
+      'callback' => 'url',
+      'callback arguments' => array("comment/$cid"),
+    ),
+  );
+  
+  $message = message_create('comment_insert', array('arguments' => $arguments));
+  $options = array(
+    'save rendered subject field' => 'field_message_rendered_subject',
+    'save rendered body field' => 'field_message_rendered_body',  
+  );
+  
+  message_notify_send_mail($message, $options);  
+}
+
+/**
+ * Message callback; Get the label (e.g. node title) of an entity.
+ *
+ * @param $entity_type
+ *   The entity type.
+ * @param $entity_id
+ *   The entity ID.
+ */
+function message_notify_example_entity_label($entity_type, $entity_id) {
+  $wrapper = entity_metadata_wrapper($entity_type, $entity_id);
+  return $wrapper->label();
+}
