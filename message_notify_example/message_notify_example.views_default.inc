@@ -184,6 +184,9 @@ function message_notify_example_views_default_views() {
   /* Display: Page */
   $handler = $view->new_display('page', 'Page', 'page');
   $handler->display->display_options['path'] = 'message-notify-example';
+  $handler->display->display_options['menu']['type'] = 'normal';
+  $handler->display->display_options['menu']['title'] = 'Message notify example';
+  $handler->display->display_options['menu']['weight'] = '0';
   $export['message_notify_example'] = $view;
 
   return $export;

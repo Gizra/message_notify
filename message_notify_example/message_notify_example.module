@@ -28,7 +28,7 @@ function message_notify_example_comment_insert($comment) {
       'callback' => 'url',
       'callback arguments' => array("node/$nid"),
     ),
-    '@user' => array(
+    '@node-author' => array(
       'callback' => 'message_notify_example_entity_label',
       'callback arguments' => array('user', $wrapper->node->author->getIdentifier()),
     ),
