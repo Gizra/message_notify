@@ -6,6 +6,49 @@
  */
 
 /**
+ * Process and send a message.
+ */
+function message_notify_send_mail(Message $message, $options = array()) {
+  // Set default values.
+  $options += array(
+    'save on fail' => TRUE,
+    'save on success' => TRUE,
+    'save rendered subject field' => FALSE,
+    'save rendered body field' => FALSE,
+  );
+
+  $account = user_load($message->uid);
+  $element = $message->buildContent('full', $account->language);
+
+  $message->rendered_subject = $element['subject']['#markup'];
+  $message->rendered_body = $element['text']['#markup'];
+
+  $wrapper = entity_metadata_wrapper('message', $message);
+  if ($options['save rendered subject field']) {
+    $message->{$options['save rendered subject field']}->set($message->rendered_subject);
+  }
+  if ($options['save rendered body field']) {
+    $message->{$options['save rendered body field']}->set($message->rendered_body);
+  }
+
+  $params = array(
+    'message_entity' => $message,
+    'rendered_subject' => $message->rendered_subject,
+    'rendered_body' => $message->rendered_body,
+  );
+
+  $lang = !empty($ccount->language) ? $languages[$account->language]: language_default();
+  $result = drupal_mail('message_notify', $message->type, $account->mail, $lang, $params);
+  if (!$result && $options['save on fail']) {
+    $message->save();
+  }
+  elseif ($result && $options['save on success']) {
+    $message->save();
+  }
+  return $result;
+}
+
+/**
  * Implements hook_message_view().
  */
 function message_notify_message_view($message, $view_mode, $langcode) {
@@ -37,9 +80,6 @@ function message_notify_default_message_type_category() {
  * Set's the message subject and body as configured.
  */
 function message_notify_mail($key, &$message, $params) {
-  $message_entity = $params['message'];
-  $element = $message_entity->buildContent('full', $message['language']->language);
-
-  $message['subject'] = str_replace(array("\r", "\n"), '', drupal_render($element['subject']));
-  $message['body'][] = drupal_render($element['text']);
+  $message['subject'] = $params['rendered_subject'];
+  $message['body'][] = $params['rendered_body'];
 }
