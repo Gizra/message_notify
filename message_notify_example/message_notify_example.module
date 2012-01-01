@@ -42,7 +42,7 @@ function message_notify_example_comment_insert($comment) {
     ),
   );
 
-  $message = message_create('comment_insert', array('arguments' => $arguments));
+  $message = message_create('comment_insert', array('arguments' => $arguments, 'uid' => $comment->uid));
   $options = array(
     'save rendered subject field' => 'field_message_rendered_subject',
     'save rendered body field' => 'field_message_rendered_body',
