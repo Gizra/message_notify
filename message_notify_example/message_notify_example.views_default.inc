@@ -187,6 +187,25 @@ function message_notify_example_views_default_views() {
   $handler->display->display_options['menu']['type'] = 'normal';
   $handler->display->display_options['menu']['title'] = 'Message notify example';
   $handler->display->display_options['menu']['weight'] = '0';
+  $translatables['message_notify_example'] = array(
+    t('Master'),
+    t('Message notify example'),
+    t('more'),
+    t('Apply'),
+    t('Reset'),
+    t('Sort by'),
+    t('Asc'),
+    t('Desc'),
+    t('Items per page'),
+    t('- All -'),
+    t('Offset'),
+    t('User'),
+    t('Rendered subject'),
+    t('Rendered body'),
+    t('Name'),
+    t('Timestamp'),
+    t('Page'),
+  );
   $export['message_notify_example'] = $view;
 
   return $export;
