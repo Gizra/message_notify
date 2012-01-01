@@ -22,7 +22,13 @@ function message_notify_example_default_message_type() {
   $items['comment_insert'] = entity_import('message_type', '{
     "name" : "comment_insert",
     "description" : "Comment insert",
-    "argument_keys" : [ "@comment-author", "@comment-author-url", "@node-url", "@node-title" ],
+    "argument_keys" : [
+      "@comment-author",
+      "@comment-author-url",
+      "@node-url",
+      "@node-title",
+      "@node-author"
+    ],
     "category" : "message_type_email",
     "message_text" : { "und" : [
         {
