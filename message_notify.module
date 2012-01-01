@@ -39,8 +39,11 @@ function message_notify_send_mail(Message $message, $options = array()) {
 
   $lang = !empty($ccount->language) ? $languages[$account->language]: language_default();
   $result = drupal_mail('message_notify', $message->type, $account->mail, $lang, $params);
-  if (!$result && $options['save on fail']) {
-    $message->save();
+  if (!$result) {
+    watchdog('message_notify', t('Could not send "@type" email to user ID @uid'), array('@message' => $message->type, '@uid' => $message->uid), WATCHDOG_ERROR);
+    if ($options['save on fail']) {
+      $message->save();
+    }
   }
   elseif ($result && $options['save on success']) {
     $message->save();
