@@ -41,6 +41,10 @@ function message_notify_install() {
     'label' => t('Message email subject'),
     'description' => t('This is the subject of the email.'),
     'required' => TRUE,
+    'widget' => array(
+      // Position above the text field.
+      'weight' => -10,
+    ),
   );
   field_create_instance($instance);
 }
