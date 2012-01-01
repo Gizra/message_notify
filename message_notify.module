@@ -25,10 +25,10 @@ function message_notify_send_mail(Message $message, $options = array()) {
 
   $wrapper = entity_metadata_wrapper('message', $message);
   if ($options['save rendered subject field']) {
-    $message->{$options['save rendered subject field']}->set($message->rendered_subject);
+    $wrapper->{$options['save rendered subject field']}->set($message->rendered_subject);
   }
   if ($options['save rendered body field']) {
-    $message->{$options['save rendered body field']}->set($message->rendered_body);
+    $wrapper->{$options['save rendered body field']}->set(array('value' => $message->rendered_body));
   }
 
   $params = array(
