@@ -33,7 +33,7 @@ function message_notify_send_mail(Message $message, $options = array()) {
     $wrapper->{$options['save rendered body field']}->set(array('value' => $message->rendered_body, 'format' => $format));
   }
 
-  $lang = !empty($ccount->language) ? $languages[$account->language]: language_default();
+  $lang = !empty($account->language) ? $languages[$account->language]: language_default();
   $params = array(
     'message_entity' => $message,
     'rendered_subject' => $message->rendered_subject,
