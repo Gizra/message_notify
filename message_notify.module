@@ -18,10 +18,9 @@ function message_notify_send_mail(Message $message, $options = array()) {
   );
 
   $account = user_load($message->uid);
-  $element = $message->buildContent('full', $account->language);
 
-  $message->rendered_subject = $element['subject']['#markup'];
-  $message->rendered_body = $element['text']['#markup'];
+  $message->rendered_subject = $message->getText($account->language, array('field name' => 'message_text_subject'));
+  $message->rendered_body = $message->getText($account->language);
 
   $wrapper = entity_metadata_wrapper('message', $message);
   if ($options['save rendered subject field']) {
