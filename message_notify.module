@@ -80,7 +80,7 @@ function message_notify_default_message_type_category() {
 /**
  * Implements hook_mail().
  *
- * Set's the message subject and body as configured.
+ * Sets the message subject and body as configured.
  */
 function message_notify_mail($key, &$message, $params) {
   $message['subject'] = $params['rendered_subject'];
