@@ -15,12 +15,17 @@ function message_notify_send_mail(Message $message, $options = array()) {
     'save on success' => TRUE,
     'save rendered subject field' => FALSE,
     'save rendered body field' => FALSE,
+    // Override email address.
+    'mail' => FALSE,
+    // Override user's language, and use Message language.
+    'language override' => FALSE
   );
 
   $account = user_load($message->uid);
+  $element = $message->buildContent('full', $account->language);
 
-  $message->rendered_subject = $message->getText($account->language, array('field name' => 'message_text_subject'));
-  $message->rendered_body = $message->getText($account->language);
+  $message->rendered_subject = $element['subject']['#markup'];
+  $message->rendered_body = $element['text']['#markup'];
 
   $wrapper = entity_metadata_wrapper('message', $message);
   if ($options['save rendered subject field']) {
@@ -32,13 +37,23 @@ function message_notify_send_mail(Message $message, $options = array()) {
     $wrapper->{$options['save rendered body field']}->set(array('value' => $message->rendered_body, 'format' => $format));
   }
 
-  $lang = !empty($account->language) ? $languages[$account->language]: language_default();
   $params = array(
     'message_entity' => $message,
     'rendered_subject' => $message->rendered_subject,
     'rendered_body' => $message->rendered_body,
   );
-  $result = drupal_mail('message_notify', $message->type, $account->mail, $lang, $params);
+
+  $mail = $options['mail'] ? $options['mail'] : $account->mail;
+
+  $languages = language_list();
+  if (!$options['language override']) {
+    $lang = !empty($account->language) ? $languages[$account->language]: language_default();
+  }
+  else {
+    $lang = $languages[$message->language];
+  }
+
+  $result = drupal_mail('message_notify', $message->type, $mail, $lang, $params);
   if (!$result) {
     watchdog('message_notify', t('Could not send "@type" email to user ID @uid'), array('@message' => $message->type, '@uid' => $message->uid), WATCHDOG_ERROR);
     if ($options['save on fail']) {
@@ -80,7 +95,7 @@ function message_notify_default_message_type_category() {
 /**
  * Implements hook_mail().
  *
- * Sets the message subject and body as configured.
+ * Set's the message subject and body as configured.
  */
 function message_notify_mail($key, &$message, $params) {
   $message['subject'] = $params['rendered_subject'];
