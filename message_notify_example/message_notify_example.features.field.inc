@@ -10,6 +10,96 @@
 function message_notify_example_field_default_fields() {
   $fields = array();
 
+  // Exported field: 'message-comment_insert-field_comment_ref'
+  $fields['message-comment_insert-field_comment_ref'] = array(
+    'field_config' => array(
+      'active' => '1',
+      'cardinality' => '1',
+      'deleted' => '0',
+      'entity_types' => array(),
+      'field_name' => 'field_comment_ref',
+      'foreign keys' => array(
+        'comment' => array(
+          'columns' => array(
+            'target_id' => 'cid',
+          ),
+          'table' => 'comment',
+        ),
+      ),
+      'indexes' => array(
+        'target_id' => array(
+          0 => 'target_id',
+        ),
+      ),
+      'module' => 'entityreference',
+      'settings' => array(
+        'handler' => 'base',
+        'handler_settings' => array(
+          'behaviors' => array(
+            'views-select-list' => array(
+              'status' => 0,
+            ),
+          ),
+          'sort' => array(
+            'direction' => 'ASC',
+            'field' => 'comment_body:value',
+            'property' => 'nid',
+            'type' => 'none',
+          ),
+          'target_bundles' => array(),
+        ),
+        'handler_submit' => 'Change handler',
+        'target_type' => 'comment',
+      ),
+      'translatable' => '0',
+      'type' => 'entityreference',
+    ),
+    'field_instance' => array(
+      'bundle' => 'comment_insert',
+      'default_value' => NULL,
+      'default_value_function' => '',
+      'deleted' => '0',
+      'description' => '',
+      'display' => array(
+        'default' => array(
+          'label' => 'above',
+          'module' => 'entityreference',
+          'settings' => array(
+            'link' => FALSE,
+          ),
+          'type' => 'entityreference_label',
+          'weight' => 3,
+        ),
+      ),
+      'entity_type' => 'message',
+      'field_name' => 'field_comment_ref',
+      'label' => 'Comment reference',
+      'required' => 1,
+      'settings' => array(
+        'behaviors' => array(
+          'prepopulate' => array(
+            'action' => 'none',
+            'fallback' => 'none',
+            'skip_perm' => '0',
+            'status' => 0,
+          ),
+        ),
+        'user_register_form' => FALSE,
+      ),
+      'widget' => array(
+        'active' => 1,
+        'module' => 'entityreference',
+        'settings' => array(
+          'match_operator' => 'CONTAINS',
+          'path' => '',
+          'size' => '60',
+        ),
+        'type' => 'entityreference_autocomplete',
+        'weight' => '3',
+      ),
+    ),
+  );
+
   // Exported field: 'message-comment_insert-field_message_rendered_body'
   $fields['message-comment_insert-field_message_rendered_body'] = array(
     'field_config' => array(
@@ -134,6 +224,7 @@ function message_notify_example_field_default_fields() {
 
   // Translatables
   // Included for use with string extractors like potx.
+  t('Comment reference');
   t('Rendered body');
   t('Rendered subject');
 

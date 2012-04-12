@@ -22,57 +22,25 @@ function message_notify_example_default_message_type() {
   $items['comment_insert'] = entity_import('message_type', '{
     "name" : "comment_insert",
     "description" : "Comment insert",
-    "argument_keys" : [
-      "@comment-author",
-      "@comment-author-url",
-      "@node-url",
-      "@node-title",
-      "@node-author"
-    ],
+    "argument_keys" : [],
+    "argument" : [],
     "category" : "message_type_email",
-    "message_text" : {
-      "en" : [
+    "data" : { "purge" : { "override" : 0, "enabled" : 0, "quota" : "", "days" : "" } },
+    "language" : "",
+    "arguments" : null,
+    "message_text" : { "und" : [
         {
-          "value" : "Hello @node-author,  \\n\\n\\u003ca href=\\"@comment-author-url\\"\\u003e@comment-author\\u003c\\/a\\u003e has commented on your post \\u003ca href=\\"@node-url\\"\\u003e@node-title\\u003c\\/a\\u003e.  \\n\\nCheers, \\nMessage notify robot",
-          "format" : "filtered_html",
-          "safe_value" : "\\u003cp\\u003eHello @node-author,  \\u003c\\/p\\u003e\\n\\u003cp\\u003e\\u003ca href=\\"@comment-author-url\\"\\u003e@comment-author\\u003c\\/a\\u003e has commented on your post \\u003ca href=\\"@node-url\\"\\u003e@node-title\\u003c\\/a\\u003e.  \\u003c\\/p\\u003e\\n\\u003cp\\u003eCheers,\\u003cbr \\/\\u003e\\nMessage notify robot\\u003c\\/p\\u003e\\n"
-        }
-      ],
-      "fr" : [
-        {
-          "value" : "Bonjour \\u202a@node-author,\\u202c\\r\\n\\r\\n\\u202a\\u003ca href=\\"@comment-author-url\\"\\u003e@comment-author\\u003c\\/a\\u003e \\u202ca comment\\u00e9 sur votre post \\u202c\\u202a \\u003ca href=\\"@node-url\\"\\u003e@node-title\\u003c\\/a\\u003e.\\u202c\\r\\n\\r\\nSinc\\u00e8rement,\\r\\nSyst\\u00e8me de message automatique.",
-          "format" : "filtered_html",
-          "safe_value" : "\\u003cp\\u003eBonjour \\u202a@node-author,\\u202c\\u003c\\/p\\u003e\\n\\u003cp\\u003e\\u202a\\u003ca href=\\"@comment-author-url\\"\\u003e@comment-author\\u003c\\/a\\u003e \\u202ca comment\\u00e9 sur votre post \\u202c\\u202a \\u003ca href=\\"@node-url\\"\\u003e@node-title\\u003c\\/a\\u003e.\\u202c\\u003c\\/p\\u003e\\n\\u003cp\\u003eSinc\\u00e8rement,\\u003cbr \\/\\u003e\\nSyst\\u00e8me de message automatique.\\u003c\\/p\\u003e\\n"
-        }
-      ],
-      "und" : [
-        {
-          "value" : "Hello @node-author,\\r\\n\\r\\n\\u003ca href=\\"@comment-author-url\\"\\u003e@comment-author\\u003c\\/a\\u003e has commented on your post \\u003ca href=\\"@node-url\\"\\u003e@node-title\\u003c\\/a\\u003e.\\r\\n\\r\\nCheers,\\r\\nMessage notify robot\\r\\n\\r\\n",
-          "format" : "filtered_html",
-          "safe_value" : "\\u003cp\\u003eHello @node-author,\\u003c\\/p\\u003e\\n\\u003cp\\u003e\\u003ca href=\\"@comment-author-url\\"\\u003e@comment-author\\u003c\\/a\\u003e has commented on your post \\u003ca href=\\"@node-url\\"\\u003e@node-title\\u003c\\/a\\u003e.\\u003c\\/p\\u003e\\n\\u003cp\\u003eCheers,\\u003cbr \\/\\u003e\\nMessage notify robot\\u003c\\/p\\u003e\\n"
+          "value" : "Hello [message:field-comment-ref:node:author],\\r\\n\\r\\n\\u003Ca href=\\u0022[message:field-comment-ref:author:url]\\u0022\\u003E[message:field-comment-ref:author:name]\\u003C\\/a\\u003E has commented on your post \\u003Ca href=\\u0022[message:field-comment-ref:node:url]\\u0022\\u003E[message:field-comment-ref:node:title]\\u003C\\/a\\u003E.\\r\\n\\r\\nCheers,\\r\\nMessage notify example robot\\r\\n",
+          "format" : "full_html",
+          "safe_value" : "\\u003Cp\\u003EHello [message:field-comment-ref:node:author],\\u003C\\/p\\u003E\\n\\u003Cp\\u003E\\u003Ca href=\\u0022[message:field-comment-ref:author:url]\\u0022\\u003E[message:field-comment-ref:author:name]\\u003C\\/a\\u003E has commented on your post \\u003Ca href=\\u0022[message:field-comment-ref:node:url]\\u0022\\u003E[message:field-comment-ref:node:title]\\u003C\\/a\\u003E.\\u003C\\/p\\u003E\\n\\u003Cp\\u003ECheers,\\u003Cbr \\/\\u003E\\nMessage notify example robot\\u003C\\/p\\u003E\\n"
         }
       ]
     },
-    "message_text_subject" : {
-      "en" : [
+    "message_text_subject" : { "und" : [
         {
-          "value" : "@comment-author commented on @node-title ",
+          "value" : "[message:field-comment-ref:author] commented on [message:field-comment-ref:node:title]",
           "format" : null,
-          "safe_value" : "@comment-author commented on @node-title "
-        }
-      ],
-      "fr" : [
-        {
-          "value" : "@comment-author a comment\\u00e9 sur @node-title",
-          "format" : null,
-          "safe_value" : "@comment-author a comment\\u00e9 sur @node-title"
-        }
-      ],
-      "und" : [
-        {
-          "value" : "@comment-author commented on @node-title",
-          "format" : null,
-          "safe_value" : "@comment-author commented on @node-title"
+          "safe_value" : "[message:field-comment-ref:author] commented on [message:field-comment-ref:node:title]"
         }
       ]
     },
