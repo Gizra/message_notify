@@ -32,8 +32,9 @@ function message_notify_send_mail(Message $message, $options = array()) {
     $wrapper->{$options['save rendered subject field']}->set($message->rendered_subject);
   }
   if ($options['save rendered body field']) {
-    // Get the format from the field.
-    $format = $wrapper->type->{MESSAGE_FIELD_MESSAGE_TEXT}->format->value();
+    // Get the format from the field. We assume the first delta is the
+    // same as the rest.
+    $format = $wrapper->type->{MESSAGE_FIELD_MESSAGE_TEXT}->get(0)->format->value();
     $wrapper->{$options['save rendered body field']}->set(array('value' => $message->rendered_body, 'format' => $format));
   }
 
