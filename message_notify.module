@@ -47,7 +47,7 @@ function message_notify_send_mail(Message $message, $options = array()) {
 
   $languages = language_list();
   if (!$options['language override']) {
-    $lang = !empty($account->language) ? $languages[$account->language]: language_default();
+    $lang = !empty($account->language) && $account->language != LANGUAGE_NONE ? $languages[$account->language]: language_default();
   }
   else {
     $lang = $languages[$message->language];
