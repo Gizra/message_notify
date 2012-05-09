@@ -29,8 +29,8 @@ function message_notify_example_comment_insert($comment) {
   // We pass in the options the field names, that will be used to capture
   // the rendered message, and provide an email log.
   $options = array(
-    'save rendered subject field' => 'field_message_rendered_subject',
-    'save rendered body field' => 'field_message_rendered_body',
+    'rendered subject field' => 'field_message_rendered_subject',
+    'rendered body field' => 'field_message_rendered_body',
   );
   message_notify_send_mail($message, $options);
 }

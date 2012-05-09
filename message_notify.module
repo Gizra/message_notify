@@ -13,8 +13,8 @@ function message_notify_send_mail(Message $message, $options = array()) {
   $options += array(
     'save on fail' => TRUE,
     'save on success' => TRUE,
-    'save rendered subject field' => FALSE,
-    'save rendered body field' => FALSE,
+    'rendered subject field' => FALSE,
+    'rendered body field' => FALSE,
     // Override email address.
     'mail' => FALSE,
     // Override user's language, and use Message language.
@@ -28,14 +28,19 @@ function message_notify_send_mail(Message $message, $options = array()) {
   $message->rendered_body = $element['text']['#markup'];
 
   $wrapper = entity_metadata_wrapper('message', $message);
-  if ($options['save rendered subject field']) {
-    $wrapper->{$options['save rendered subject field']}->set($message->rendered_subject);
+  if ($options['rendered subject field']) {
+    $wrapper->{$options['rendered subject field']}->set($message->rendered_subject);
   }
-  if ($options['save rendered body field']) {
+  if ($options['rendered body field']) {
     // Get the format from the field. We assume the first delta is the
     // same as the rest.
-    $format = $wrapper->type->{MESSAGE_FIELD_MESSAGE_TEXT}->get(0)->format->value();
-    $wrapper->{$options['save rendered body field']}->set(array('value' => $message->rendered_body, 'format' => $format));
+    if (empty($wrapper->{$options['rendered body field']}->format)) {
+      $wrapper->{$options['rendered body field']}->set($message->rendered_body);
+    }
+    else {
+      $format = $wrapper->type->{MESSAGE_FIELD_MESSAGE_TEXT}->get(0)->format->value();
+      $wrapper->{$options['rendered body field']}->set(array('value' => $message->rendered_body, 'format' => $format));
+    }
   }
 
   $params = array(
