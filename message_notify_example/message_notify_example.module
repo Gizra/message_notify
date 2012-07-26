@@ -18,10 +18,10 @@ function message_notify_example_comment_insert($comment) {
     return;
   }
 
-  // Create a new message, assigned to the comment author, and add a
+  // Create a new message, assigned to the node author, and add a
   // reference to the comment, so we can later use tokens related to that
   // comment.
-  $message = message_create('comment_insert', array('uid' => $comment->uid));
+  $message = message_create('comment_insert', array('uid' => $node->uid));
   $wrapper = entity_metadata_wrapper('message', $message);
   $wrapper->field_comment_ref->set($comment);
 
