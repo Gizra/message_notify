@@ -1,0 +1,33 @@
+<?php
+
+/**
+ * @file
+ * Install, update, and uninstall functions for the message notify example module.
+ */
+
+/**
+ * Implements hook_install().
+ *
+ * We cannot easily set the the visibilty of extra fields, so we set the
+ * bundle settings upon installation.
+ */
+function message_notify_example_install() {
+  $bundle_settings = field_bundle_settings('message', 'comment_insert');
+
+  $display = &$bundle_settings['extra_fields']['display'];
+
+  $visible = array('visible' => TRUE, 'weight' => 0);
+  $hidden = array('visible' => FALSE, 'weight' => 0);
+
+  $display['message_text_subject__0'] = array(
+    'message_notify_email_subject' => $visible,
+    'message_notify_email_body' => $hidden,
+  );
+
+  $display['message_text__0'] = array(
+    'message_notify_email_subject' => $hidden,
+    'message_notify_email_body' => $visible,
+  );
+
+  field_bundle_settings('message', 'comment_insert', $bundle_settings);
+}

@@ -14,8 +14,9 @@ include_once('message_notify_example.features.inc');
 function message_notify_example_comment_insert($comment) {
   $node = node_load($comment->nid);
   if ($comment->uid == $node->uid) {
-    // The comment author is also the node author.
-    return;
+    // The comment author is also the node author, and we would ususally
+    // return early here, but since this is an example, we send an email
+    // anyway.
   }
 
   // Create a new message, assigned to the node author, and add a
@@ -29,8 +30,10 @@ function message_notify_example_comment_insert($comment) {
   // We pass in the options the field names, that will be used to capture
   // the rendered message, and provide an email log.
   $options = array(
-    'rendered subject field' => 'field_message_rendered_subject',
-    'rendered body field' => 'field_message_rendered_body',
+    'rendered fields' => array(
+      'message_notify_email_subject' => 'field_message_rendered_subject',
+      'message_notify_email_body' => 'field_message_rendered_body',
+    ),
   );
-  message_notify_send_mail($message, $options);
+  message_notify_send_message($message, $options);
 }

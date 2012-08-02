@@ -7,80 +7,77 @@
 
 /**
  * Process and send a message.
+ *
+ * @param $message
+ *   The message entity being used for the notification.
+ * @param $options
+ *   Array of options to override the plugin's default ones.
+ * @param $notifier_name
+ *   Optional; The name of the notifier to use. Defaults to "email"
+ *   sending method.
+ *
+ * @return
+ *   Boolean value denoting success or failure of the notification.
  */
-function message_notify_send_mail(Message $message, $options = array()) {
-  // Set default values.
-  $options += array(
-    'save on fail' => TRUE,
-    'save on success' => TRUE,
-    'rendered subject field' => FALSE,
-    'rendered body field' => FALSE,
-    // Override email address.
-    'mail' => FALSE,
-    // Override user's language, and use Message language.
-    'language override' => FALSE
-  );
-
-  $account = user_load($message->uid);
-  $element = $message->buildContent('full', $account->language);
-
-  $message->rendered_subject = $element['subject']['#markup'];
-  $message->rendered_body = $element['text']['#markup'];
-
-  $wrapper = entity_metadata_wrapper('message', $message);
-  if ($options['rendered subject field']) {
-    $wrapper->{$options['rendered subject field']}->set($message->rendered_subject);
-  }
-  if ($options['rendered body field']) {
-    // Get the format from the field. We assume the first delta is the
-    // same as the rest.
-    if (empty($wrapper->{$options['rendered body field']}->format)) {
-      $wrapper->{$options['rendered body field']}->set($message->rendered_body);
-    }
-    else {
-      $format = $wrapper->type->{MESSAGE_FIELD_MESSAGE_TEXT}->get(0)->format->value();
-      $wrapper->{$options['rendered body field']}->set(array('value' => $message->rendered_body, 'format' => $format));
-    }
+function message_notify_send_message(Message $message, array $options = array(), $notifier_name = 'email') {
+  if (!$plugin = message_notify_get_notifier($notifier_name)) {
+   throw new MessageNotifyException(format_string('Could not send notification using the "@notifier" notifier.'), array('@notifier' => $notifier_name));
   }
 
-  $params = array(
-    'message_entity' => $message,
-    'rendered_subject' => $message->rendered_subject,
-    'rendered_body' => $message->rendered_body,
-  );
+  $plugin['options'] = drupal_array_merge_deep($plugin['options'], $options);
 
-  $mail = $options['mail'] ? $options['mail'] : $account->mail;
-
-  $languages = language_list();
-  if (!$options['language override']) {
-    $lang = !empty($account->language) && $account->language != LANGUAGE_NONE ? $languages[$account->language]: language_default();
+  $class = ctools_plugin_load_class('message_notify', 'notifier', $notifier_name, 'class');
+  $notifier = new $class($plugin, $message);
+  if ($notifier->access()) {
+    return $notifier->send();
   }
-  else {
-    $lang = $languages[$message->language];
-  }
-
-  $result = drupal_mail('message_notify', $message->type, $mail, $lang, $params);
-  if (!$result) {
-    watchdog('message_notify', t('Could not send "@type" email to user ID @uid'), array('@message' => $message->type, '@uid' => $message->uid), WATCHDOG_ERROR);
-    if ($options['save on fail']) {
-      $message->save();
-    }
-  }
-  elseif ($result && $options['save on success']) {
-    $message->save();
-  }
-  return $result;
 }
 
 /**
- * Implements hook_message_view().
+ * Add defaults values to the notifier plugins.
+ *
+ * - 'description': The description of the plugin.
+ * - 'options': Array with the following keys:
+ *   - 'save on fail': Save the message is delivery failed. Defaults to
+ *     TRUE.
+ *   - 'save on success': Save the message is delivery successded. Defaults to
+ *     TRUE.
+ *   - 'language override': Override user's language, and use the
+ *     Message's language. Defaults to FALSE.
+ *   - 'rendered fields': Array keyed with the view mode(s), and the text
+ *     field(s) to save the rendered output.
+ *     The rendered field is used when it is needed to save the message
+ *     exactly as it was sent (for example for message logs), as it might
+ *     change and show differently when viewed later - as a result of on
+ *     the fly token replacement, or even editing the message type.
  */
-function message_notify_message_view($message, $view_mode, $langcode) {
-  if ($message->getType()->category == 'message_type_email') {
-    $message->content['subject'] = array(
-      // Add the subject field.
-      '#markup' => $message->getText($langcode, array('field name' => 'message_text_subject')),
-    );
+function message_notify_plugin_process(&$plugin, $info) {
+  $plugin += array(
+    'description' => '',
+    'options' => array(),
+  );
+  $plugin['options'] += array(
+    'save on fail' => TRUE,
+    'save on success' => TRUE,
+    'language override' => FALSE,
+    'rendered fields' => array(),
+  );
+}
+
+/**
+ * Implements hook_entity_info_alter().
+ *
+ * Add a the notifiers view modes.
+ */
+function message_notify_entity_info_alter(&$entity_info) {
+  foreach (message_notify_get_notifiers() as $notifier_name => $plugin) {
+    $class = ctools_plugin_load_class('message_notify', 'notifier', $notifier_name, 'class');
+    $view_modes = $class::viewModes();
+    // Set default values.
+    foreach ($view_modes as &$view_mode) {
+      $view_mode += array('custom settings' => TRUE);
+    }
+    $entity_info['message']['view modes'] += $view_modes;
   }
 }
 
@@ -104,6 +101,66 @@ function message_notify_default_message_type_category() {
  * Set's the message subject and body as configured.
  */
 function message_notify_mail($key, &$message, $params) {
-  $message['subject'] = $params['rendered_subject'];
-  $message['body'][] = $params['rendered_body'];
+  $message['subject'] = $params['message_notify_email_subject'];
+  $message['body'][] = $params['message_notify_email_body'];
+}
+
+/**
+ * Implements hook_ctools_plugin_api().
+ */
+function message_notify_ctools_plugin_api($module, $api) {
+  if ($module == 'message_notify' && $api == 'notifier') {
+    return array('version' => 1);
+  }
+}
+
+/**
+ * Implements hook_ctools_plugin_type().
+ */
+function message_notify_ctools_plugin_type() {
+  $plugins['notifier'] = array(
+    'classes' => array('class'),
+    'process' => 'message_notify_plugin_process',
+  );
+  return $plugins;
+}
+
+/**
+ * Implements hook_ctools_plugin_directory().
+ */
+function message_notify_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'message_notify') {
+    return 'plugins/' . $plugin;
+  }
+}
+
+/**
+ * Helper function to include CTools plugins and get a notifier plguin.
+ *
+ * @param $plugin_name
+ *   The plugin that should be laoded.
+ */
+function message_notify_get_notifier($notifier_name) {
+  ctools_include('plugins');
+  return ctools_get_plugins('message_notify', 'notifier', $notifier_name);
+}
+
+/**
+ * Helper function to include CTools plugins and get all notifier plugins.
+ */
+function message_notify_get_notifiers() {
+  ctools_include('plugins');
+  return ctools_get_plugins('message_notify', 'notifier');
+}
+
+/**
+ * Deprectaed: Send email.
+ *
+ * Wrapper function for message_notify_send_message(), using the "email"
+ * notifier.
+ *
+ * @deprecated
+ */
+function message_notify_send_mail(Message $message, array $options = array()) {
+  message_notify_send_message($message, $options, 'email');
 }

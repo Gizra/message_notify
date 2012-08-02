@@ -31,6 +31,10 @@ function message_notify_install() {
     'cardinality' => 1,
     'translatable' => TRUE,
     'locked' => TRUE,
+    'settings' => array(
+      // Mark that this field can be rendered using Message::getText().
+      'message_text' => TRUE,
+    ),
   );
   $field = field_create_field($field);
 
@@ -47,4 +51,20 @@ function message_notify_install() {
     ),
   );
   field_create_instance($instance);
+}
+
+/**
+ * Mark message-text field as renderable using getText().
+ */
+function message_notify_update_7000() {
+  $field = field_info_field('message_text_subject');
+  $field['settings']['message_text'] = TRUE;
+  field_update_field($field);
+}
+
+/**
+ * Explain about using View-modes.
+ */
+function message_notify_update_7001() {
+  return t('Message notify now works with view modes - assign the fields that should be renderd in the "Manage display" of each message-type.');
 }

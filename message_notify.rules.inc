@@ -71,7 +71,7 @@ function message_notify_rules_process(Message $message, $save_on_fail, $save_on_
     'rendered subject field' => $rendered_subject_field,
     'rendered body field'    => $rendered_body_field,
   );
-  message_notify_send_mail($message, $options);
+  message_notify_send_message($message, $options, 'email');
 }
 
 /**
