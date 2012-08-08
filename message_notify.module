@@ -106,6 +106,41 @@ function message_notify_mail($key, &$message, $params) {
 }
 
 /**
+ * Implements hook_field_attach_create_bundle().
+ *
+ * We cannot easily set the the visibilty of extra fields, so we set the
+ * bundle settings upon creation of new message bundle.
+ */
+function message_notify_field_attach_create_bundle($entity_type, $bundle) {
+  if ($entity_type != 'message') {
+    return;
+  }
+
+  $message_type = message_type_load($bundle);
+  if ($message_type->category != 'message_type_email') {
+    return;
+  }
+
+  $bundle_settings = field_bundle_settings('message', $bundle);
+  $display = &$bundle_settings['extra_fields']['display'];
+
+  $visible = array('visible' => TRUE, 'weight' => 0);
+  $hidden = array('visible' => FALSE, 'weight' => 0);
+
+  $display['message_text_subject__0'] = array(
+    'message_notify_email_subject' => $visible,
+    'message_notify_email_body' => $hidden,
+  );
+
+  $display['message_text__0'] = array(
+    'message_notify_email_subject' => $hidden,
+    'message_notify_email_body' => $visible,
+  );
+
+  field_bundle_settings('message', $bundle, $bundle_settings);
+}
+
+/**
  * Implements hook_ctools_plugin_api().
  */
 function message_notify_ctools_plugin_api($module, $api) {
