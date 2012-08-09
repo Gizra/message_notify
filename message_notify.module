@@ -127,12 +127,12 @@ function message_notify_field_attach_create_bundle($entity_type, $bundle) {
   $visible = array('visible' => TRUE, 'weight' => 0);
   $hidden = array('visible' => FALSE, 'weight' => 0);
 
-  $display['message_text_subject__0'] = array(
+  $display['message__message_text_subject__0'] = array(
     'message_notify_email_subject' => $visible,
     'message_notify_email_body' => $hidden,
   );
 
-  $display['message_text__0'] = array(
+  $display['message__message_text__0'] = array(
     'message_notify_email_subject' => $hidden,
     'message_notify_email_body' => $visible,
   );
