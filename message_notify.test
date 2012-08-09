@@ -78,7 +78,7 @@ class MessageNotifyNotifierTest extends DrupalWebTestCase {
   /**
    * Test Message save on delivery.
    */
-  function testpostSendMessageSave() {
+  function testPostSendMessageSave() {
     $message = message_create('foo');
     $message->fail = FALSE;
     message_notify_send_message($message, array(), 'test');
@@ -109,7 +109,7 @@ class MessageNotifyNotifierTest extends DrupalWebTestCase {
   /**
    * Test populating the rednered output to fields.
    */
-  function testpostSendRenderedField() {
+  function testPostSendRenderedField() {
     $this->attachRenderedFields();
 
     // Test plain fields.
@@ -172,7 +172,7 @@ class MessageNotifyNotifierTest extends DrupalWebTestCase {
   /**
    * Helper function to attach rendred fields.
    *
-   * @see MessageNotifyNotifier::testpostSendRenderedField()
+   * @see MessageNotifyNotifier::testPostSendRenderedField()
    */
   function attachRenderedFields() {
     foreach (array('rendered_foo', 'rendered_bar', 'rendered_baz') as $field_name) {
