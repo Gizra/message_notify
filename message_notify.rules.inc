@@ -66,11 +66,16 @@ function message_notify_rules_action_info() {
  */
 function message_notify_rules_process(Message $message, $save_on_fail, $save_on_success, $rendered_subject_field, $rendered_body_field) {
   $options = array(
-    'save on fail'           => $save_on_fail,
-    'save on success'        => $save_on_success,
-    'rendered subject field' => $rendered_subject_field,
-    'rendered body field'    => $rendered_body_field,
+    'save on fail' => $save_on_fail,
+    'save on success' => $save_on_success,
   );
+
+  if ($rendered_subject_field && $rendered_body_field) {
+    $options['rendered fields'] = array(
+      'message_notify_email_subject' => $rendered_subject_field,
+      'message_notify_email_body' => $rendered_body_field,
+    );
+  }
   message_notify_send_message($message, $options, 'email');
 }
 
@@ -92,6 +97,7 @@ function message_notify_field_text_list() {
         // Field is not a text field.
         continue;
       }
+
       $options[$field_name] = $instance['label'];
     }
   }
