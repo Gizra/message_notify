@@ -33,7 +33,7 @@ class MessageNotifierEmail extends MessageNotifierBase {
     }
 
     // The subject in an email can't be with HTML, so strip it.
-    $output['message_notify_email_body'] = strip_tags($output['message_notify_email_body']);
+    $output['message_notify_email_subject'] = strip_tags($output['message_notify_email_subject']);
 
     return drupal_mail('message_notify', $message->type, $mail, $lang, $output);
   }
