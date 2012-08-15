@@ -49,13 +49,13 @@ class MessageNotifyNotifierTest extends DrupalWebTestCase {
     // and display the last partial first.
     $settings = field_bundle_settings('message', 'foo');
     $settings['view_modes']['full']['custom_settings'] = TRUE;
-    $settings['extra_fields']['display']['message_text__0']['foo'] = array('weight' => 0, 'visible' => FALSE);
-    $settings['extra_fields']['display']['message_text__1']['foo'] = array('weight' => 0, 'visible' => TRUE);
-    $settings['extra_fields']['display']['message_text_another__0']['foo'] = array('weight' => 0, 'visible' => FALSE);
+    $settings['extra_fields']['display']['message__message_text__0']['foo'] = array('weight' => 0, 'visible' => FALSE);
+    $settings['extra_fields']['display']['message__message_text__1']['foo'] = array('weight' => 0, 'visible' => TRUE);
+    $settings['extra_fields']['display']['message__message_text_another__0']['foo'] = array('weight' => 0, 'visible' => FALSE);
 
-    $settings['extra_fields']['display']['message_text__0']['bar'] = array('weight' => 0, 'visible' => FALSE);
-    $settings['extra_fields']['display']['message_text__1']['bar'] = array('weight' => 0, 'visible' => FALSE);
-    $settings['extra_fields']['display']['message_text_another__0']['bar'] = array('weight' => 0, 'visible' => TRUE);
+    $settings['extra_fields']['display']['message__message_text__0']['bar'] = array('weight' => 0, 'visible' => FALSE);
+    $settings['extra_fields']['display']['message__message_text__1']['bar'] = array('weight' => 0, 'visible' => FALSE);
+    $settings['extra_fields']['display']['message__message_text_another__0']['bar'] = array('weight' => 0, 'visible' => TRUE);
     field_bundle_settings('message', 'foo', $settings);
   }
 
