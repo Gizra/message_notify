@@ -68,3 +68,12 @@ function message_notify_update_7000() {
 function message_notify_update_7001() {
   return t('Message notify now works with view modes - assign the fields that should be renderd in the "Manage display" of each message-type.');
 }
+
+/**
+ * Mark message-text field as renderable using getText().
+ */
+function message_notify_update_7002() {
+  $field = field_info_field('message_text_subject');
+  $field['settings']['message_text'] = TRUE;
+  field_update_field($field);
+}
