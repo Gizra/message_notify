@@ -35,5 +35,10 @@ function message_notify_example_comment_insert($comment) {
       'message_notify_email_body' => 'field_message_rendered_body',
     ),
   );
+
   message_notify_send_message($message, $options);
+  if (module_exists('message_subscribe')) {
+    // If Message-subscribe exists, let this example module use it.
+    message_subscribe_process_message('node', $node, $message, array('email' => $options));
+  }
 }
