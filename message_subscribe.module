@@ -4,7 +4,6 @@
  * @file
  * Subscribe API for the Message and Message notify modules.
  */
-include_once 'message_subscribe.features.inc';
 
 /**
  * Process a message, and send to subscribed users.
