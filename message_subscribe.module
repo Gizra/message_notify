@@ -119,7 +119,7 @@ function message_subscribe_process_message($entity_type, $entity, Message $messa
  *   array(
  *     1 => array(
  *       'flags' => array('subscribe_node', 'subscribe_user'),
- *       'notifer names' => array('email', 'sms'),
+ *       'notifiers' => array('email', 'sms'),
  *     ),
  *   );
  *   @endcode
