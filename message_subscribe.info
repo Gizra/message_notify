@@ -8,9 +8,5 @@ dependencies[] = ctools
 dependencies[] = flag
 dependencies[] = message
 dependencies[] = message_notify
-features[features_api][] = api:1
-features[flag][] = subscribe_node
-features[flag][] = subscribe_term
-features[flag][] = subscribe_user
 
 files[] = message_subscribe.test
