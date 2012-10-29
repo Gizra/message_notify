@@ -219,6 +219,9 @@ class MessageSubscribeSubscribersTest extends DrupalWebTestCase {
   function testGetSubscribers() {
     $message = message_create('foo', array());
 
+    // Override default notifiers.
+    variable_set('message_subscribe_default_notifiers', array());
+
     $node = $this->node;
     $user1 = $this->user1;
     $user2 = $this->user2;

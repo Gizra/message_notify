@@ -145,6 +145,8 @@ function message_subscribe_get_subscribers($entity_type, $entity, Message $messa
     'subscribe_options' => $subscribe_options,
   );
 
+  _message_subscribe_add_default_notifiers($uids);
+
   drupal_alter('message_subscribe_get_subscribers', $uids, $values);
 
   return $uids;
@@ -499,4 +501,24 @@ function message_subscribe_flag_default_flags() {
 
   return $flags;
 
+}
+
+/**
+ * Helper function that adds default notifiers to the user IDs array.
+ *
+ * @param $uids
+ *   Array detailing notification info for users.
+ *
+ * @see message_subscribe_get_subscribers().
+ */
+function _message_subscribe_add_default_notifiers(&$uids) {
+  $notifiers = variable_get('message_subscribe_default_notifiers', array('email' => 'email'));
+  if (empty($notifiers)) {
+    return;
+  }
+
+  // Add the notifiers to each user.
+  foreach ($uids as $delta => $uid) {
+    $uids[$delta]['notifiers'] += $notifiers;
+  }
 }

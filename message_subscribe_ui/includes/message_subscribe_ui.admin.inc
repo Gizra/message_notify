@@ -9,6 +9,16 @@
  * Menu callback; Admin settings form.
  */
 function message_subscribe_ui_admin_settings() {
+  $form['message_subscribe_default_notifiers'] = array(
+    '#type' => 'select',
+    '#title' => t('Default message notifiers'),
+    '#description' => t('Which message notifiers will be added to every subscription.'),
+    '#default_value' => variable_get('message_subscribe_default_notifiers', 'email'),
+    '#multiple' => TRUE,
+    '#options' => message_notify_get_notifiers_as_options(),
+    '#required' => FALSE,
+  );
+
   // For every subscription flag, show a view selection.
   foreach (message_subscribe_flag_get_flags() as $flag) {
     $name = 'message_' . $flag->name;
