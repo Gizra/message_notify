@@ -388,6 +388,7 @@ function message_subscribe_flag_default_flags() {
       0 => 'name',
     ),
     'api_version' => 2,
+    'status' => FALSE,
   );
   // Exported flag: "Terms".
   $flags['subscribe_term'] = array(
@@ -420,6 +421,7 @@ function message_subscribe_flag_default_flags() {
       0 => 'name',
     ),
     'api_version' => 2,
+    'status' => FALSE,
   );
   // Exported flag: "Users".
   $flags['subscribe_user'] = array(
@@ -453,6 +455,7 @@ function message_subscribe_flag_default_flags() {
       0 => 'name',
     ),
     'api_version' => 2,
+    'status' => FALSE,
   );
 
   if (module_exists('og')) {
@@ -490,6 +493,7 @@ function message_subscribe_flag_default_flags() {
         0 => 'name',
       ),
       'api_version' => 2,
+      'status' => FALSE,
     );
   }
 

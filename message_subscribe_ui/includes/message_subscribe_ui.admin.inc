@@ -11,7 +11,7 @@
 function message_subscribe_ui_admin_settings() {
   // For every subscription flag, show a view selection.
   foreach (message_subscribe_flag_get_flags() as $flag) {
-    $name = 'message_subscribe_' . $flag->name;
+    $name = 'message_' . $flag->name;
     $params = array('@title' => $flag->title);
 
     $form[$name] = array(
