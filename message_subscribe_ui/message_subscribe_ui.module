@@ -14,6 +14,8 @@ function message_subscribe_ui_menu() {
   $items['user/%user/message-subscribe'] = array(
     'title' => 'Message subscribe',
     'type' => MENU_LOCAL_TASK,
+    'page callback' => 'message_subscribe_ui_tab',
+    'page arguments' => array(1),
     'access callback' => 'message_subscribe_ui_tab_access',
     'access arguments' => array(1),
   );
@@ -70,7 +72,6 @@ function message_subscribe_ui_tab_access($account, $flag_name = NULL) {
 
   if (!$flag_name) {
     // We are inside /message-subscribe so get the first flag.
-    // TODO: Probably need to improve.
     $flag_name = key(message_subscribe_flag_get_flags());
   }
 
@@ -99,8 +100,14 @@ function message_subscribe_ui_tab_access($account, $flag_name = NULL) {
  * @param $flag_name
  *   The flag name.
  */
-function message_subscribe_ui_tab_title($account, $flag_name) {
+function message_subscribe_ui_tab_title($account, $flag_name = NULL) {
   global $user;
+
+  if (!$flag_name) {
+    // We are inside /message-subscribe so get the first flag.
+    $flag_name = key(message_subscribe_flag_get_flags());
+  }
+
   $flag = flag_get_flag($flag_name);
   $flaggings = flag_get_user_flags($flag->content_type, NULL, $account->uid);
 
@@ -124,7 +131,12 @@ function message_subscribe_ui_tab_title($account, $flag_name) {
  * @return
  *   A rendered View, or NULL if View was not found.
  */
-function message_subscribe_ui_tab($account, $flag_name) {
+function message_subscribe_ui_tab($account, $flag_name = NULL) {
+  if (!$flag_name) {
+    // We are inside /message-subscribe so get the first flag.
+    $flag_name = key(message_subscribe_flag_get_flags());
+  }
+
   $flag = flag_get_flag($flag_name);
   list($view_name, $display_id) = explode(':', variable_get('message_subscribe_' . $flag->name, 'subscribe_' . $flag->content_type . ':default'));
 
