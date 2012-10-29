@@ -189,6 +189,19 @@ function message_notify_get_notifiers() {
 }
 
 /**
+ * Helper function to return all notifiers as options for a select list.
+ */
+function message_notify_get_notifiers_as_options() {
+  $notifiers = message_notify_get_notifiers();
+  $options = array();
+  foreach ($notifiers as $notifier_name => $notifier) {
+    $options[$notifier_name] = check_plain($notifier['title']);
+  }
+
+  return $options;
+}
+
+/**
  * Deprectaed: Send email.
  *
  * Wrapper function for message_notify_send_message(), using the "email"
