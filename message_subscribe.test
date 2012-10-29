@@ -186,15 +186,19 @@ class MessageSubscribeSubscribersTest extends DrupalWebTestCase {
     $node = $this->drupalCreateNode($settings);
 
     // Enable flags.
-    $flag = flag_get_flag('subscribe_node');
-    $flag->status = TRUE;
+    $flags = flag_get_default_flags(TRUE);
+
+    $flag = $flags['subscribe_node'];
     $flag->types[] = $node_type;
     $flag->save();
+    $flag->enable();
 
-    $flag = flag_get_flag('subscribe_user');
-    $flag->status = TRUE;
+    $flag = $flags['subscribe_user'];
     $flag->save();
+    $flag->enable();
 
+    // Reset flag's static variable.
+    drupal_static_reset('flag_get_flags');
 
     // User1 and User2 flags node1.
     flag('flag', 'subscribe_node', $node->nid, $user1);
