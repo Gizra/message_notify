@@ -19,6 +19,8 @@ function message_subscribe_ui_admin_settings() {
     '#required' => FALSE,
   );
 
+  $prefix = variable_get('message_subscribe_flag_prefix', 'subscribe') . '_';
+
   // For every subscription flag, show a view selection.
   foreach (message_subscribe_flag_get_flags() as $flag) {
     $name = 'message_' . $flag->name;
@@ -29,10 +31,18 @@ function message_subscribe_ui_admin_settings() {
       '#title' => t('View for flag <em>@title</em>', $params),
       '#description' => t('Select the View that should be used for flag @title.', $params),
       '#options' => views_get_views_as_options(),
-      '#default_value' => variable_get($name, 'subscribe_' . $flag->content_type . ':default'),
+      '#default_value' => variable_get($name, $prefix . $flag->content_type . ':default'),
       '#required' => TRUE,
     );
   }
+
+  $form['message_subscribe_flag_prefix'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Flag prefix'),
+    '#description' => t('The prefix that will be used to identify subscription flags. This can be used if you already have flags defined with another prefix e.g. "follow".'),
+    '#default_value' => variable_get('message_subscribe_flag_prefix', 'subscribe'),
+    '#required' => FALSE,
+  );
 
   return system_settings_form($form);
 }

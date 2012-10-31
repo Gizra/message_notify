@@ -347,9 +347,10 @@ function message_subscribe_message_subscribe_get_subscribers(Message $message, $
 function message_subscribe_flag_get_flags($content_type = NULL, $content_subtype = NULL, $account = NULL, $reset = FALSE) {
   $flags = flag_get_flags($content_type, $content_subtype, $account, $reset);
   $ms_flags = array();
+  $prefix = variable_get('message_subscribe_flag_prefix', 'subscribe') . '_';
   foreach ($flags as $flag_name => $flag) {
     // Check that the flag is using name convention.
-    if (strpos($flag_name, 'subscribe_') === 0) {
+    if (strpos($flag_name, $prefix) === 0) {
       $ms_flags[$flag_name] = $flag;
     }
   }

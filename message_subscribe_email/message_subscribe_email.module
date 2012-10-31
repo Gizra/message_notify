@@ -13,9 +13,10 @@ function message_subscribe_email_flag_access($flag, $content_id, $action, $accou
     $user_flags = flag_get_user_flags($flag->content_type, $content_id);
 
     $name = str_replace('email_', '', $flag->name);
+    $prefix = variable_get('message_subscribe_flag_prefix', 'subscribe') . '_';
     // Disable access to the flag when the subscribe flag is unflagged, but
     // allow unflagging.
-    return $action == 'unflag' || !empty($user_flags['subscribe_' . $name]);
+    return $action == 'unflag' || !empty($user_flags[$prefix . $name]);
   }
 }
 
@@ -26,13 +27,14 @@ function message_subscribe_email_flag_access($flag, $content_id, $action, $accou
  * and flag the user for emails accordingly.
  */
 function message_subscribe_email_flag($action, $flag, $content_id, $account) {
-  if (strpos($flag->name, 'subscribe_') === 0) {
+  $prefix = variable_get('message_subscribe_flag_prefix', 'subscribe') . '_';
+  if (strpos($flag->name, $prefix) === 0) {
     // The flag is a subscription flag.
     $wrapper = entity_metadata_wrapper('user', $account);
     if ($wrapper->message_subscribe_email->value() || $action == 'unflag') {
       // User wants to use email for the subscription.
       // Flag or unflag user for emailing according to action taken.
-      $name = str_replace('subscribe_', '', $flag->name);
+      $name = str_replace($prefix, '', $flag->name);
       flag($action, 'email_' . $name, $content_id, $account);
     }
   }

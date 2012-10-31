@@ -143,11 +143,15 @@ function message_subscribe_ui_tab($account, $flag_name = NULL) {
   }
 
   $flag = flag_get_flag($flag_name);
-  list($view_name, $display_id) = explode(':', variable_get('message_' . $flag->name, 'subscribe_' . $flag->content_type . ':default'));
+  $prefix = variable_get('message_subscribe_flag_prefix', 'subscribe') . '_';
+  list($view_name, $display_id) = explode(':', variable_get('message_' . $flag->name, $prefix . $flag->content_type . ':default'));
 
   if (!$view = views_get_view($view_name)) {
     // View doesn't exist.
-    return;
+    $params = array('%name' => $view_name);
+    watchdog('message_sbuscribe', t('View %name does not exist.'), $params);
+    return drupal_set_message(t('There View %name does not exist.', $params), 'error');
+    return '';
   }
   $view->set_display($display_id);
   $view->set_arguments(array($account->uid));
@@ -161,9 +165,7 @@ function message_subscribe_ui_tab($account, $flag_name = NULL) {
       // Check that the flag is valid.
       $rel_flag = flag_get_flag($relationship['flag']);
       if (empty($rel_flag) || (isset($rel_flag->status) && $rel_flag->status === FALSE)) {
-        $params = array(
-          '%name' => $relationship['flag'],
-        );
+        $params = array('%name' => $relationship['flag']);
         watchdog('message_sbuscribe', t('Flag %name is not setup corrcetly. It is probably disabled or have no bundles configured.'), $params);
         return drupal_set_message(t('There Flag %name is not configured correctly.', $params), 'error');
       }
