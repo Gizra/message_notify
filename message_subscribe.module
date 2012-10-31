@@ -124,7 +124,7 @@ function message_subscribe_process_message($entity_type, $entity, Message $messa
  *   @endcode
  */
 function message_subscribe_get_subscribers($entity_type, $entity, Message $message, $subscribe_options = array(), &$context = array()) {
-  $context = $context ? $context : message_subscribe_get_basic_context($entity_type, $entity, $message, $subscribe_options, $context);
+  $context = $context ? $context : message_subscribe_get_basic_context($entity_type, $entity, $subscribe_options, $context);
 
   $uids = array();
   // We don't use module_invoke_all() is we want to retain the array keys,
@@ -160,14 +160,21 @@ function message_subscribe_get_subscribers($entity_type, $entity, Message $messa
  * For example, given a node we extract the node author and related
  * taxonomy terms.
  *
+ * @param $entity_type
+ *   The entity type.
  * @param $entity
- *   The entity for which the event was fired.
+ *   The entity object.
+ * @param $subscribe_options
+ *   Optional; The options array to pass to
+ *   message_subscribe_get_basic_context().
+ * @param $context
+ *   Optional; The context array.
  *
  * @return
  *   Array keyed with the entity type and array of entity IDs as the
  *   value.
  */
-function message_subscribe_get_basic_context($entity_type, $entity, Message $message, $subscribe_options = array(), $context = array()) {
+function message_subscribe_get_basic_context($entity_type, $entity, $subscribe_options = array(), $context = array()) {
   if (!$context) {
     list($id) = entity_extract_ids($entity_type, $entity);
     $context[$entity_type][$id] = $id;

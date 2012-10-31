@@ -109,10 +109,6 @@ class MessageSubscribeContextTest extends DrupalWebTestCase {
     );
     comment_save($comment);
 
-    // Create a dummy message-type.
-    $message_type = message_type_create('foo', array('message_text' => array(LANGUAGE_NONE => array(array('value' => 'Example text.')))));
-    $message_type->save();
-
     $this->node = $node;
     $this->group = $group;
     $this->comment = $comment;
@@ -120,14 +116,12 @@ class MessageSubscribeContextTest extends DrupalWebTestCase {
   }
 
   function testGetBasicContext() {
-    $message = message_create('foo', array());
-
     $node = $this->node;
     $group = $this->group;
     $comment = $this->comment;
 
     // Get context from comment.
-    $context = message_subscribe_get_basic_context('comment', $comment, $message);
+    $context = message_subscribe_get_basic_context('comment', $comment);
 
     $expected_context = array();
     $expected_context['comment'] = drupal_map_assoc(array($comment->cid));
@@ -149,7 +143,7 @@ class MessageSubscribeContextTest extends DrupalWebTestCase {
     // Pass existing context.
     $subscribe_options = array('skip context' => TRUE);
     $original_context = array('node' => array(1 => 1), 'user' => array(1 => 1));
-    $context = message_subscribe_get_basic_context('comment', $comment, $message, $subscribe_options, $original_context);
+    $context = message_subscribe_get_basic_context('comment', $comment, $subscribe_options, $original_context);
 
     $this->assertEqual($original_context, $context, 'Correct context when skiping context.');
   }
