@@ -65,8 +65,6 @@ function message_subscribe_process_message($entity_type, $entity, Message $messa
   }
 
   foreach ($uids as $uid => $values) {
-    $values['notifiers'] = !empty($values['notifiers']) ? $values['notifiers'] : array('email');
-
     // Clone the message in case it will need to be saved, it won't
     // overwrite the existing one.
     $cloned_message = clone $message;
