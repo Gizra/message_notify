@@ -82,20 +82,6 @@ function message_notify_entity_info_alter(&$entity_info) {
 }
 
 /**
- * Implements hook_default_message_type_category().
- */
-function message_notify_default_message_type_category() {
-  $items = array();
-  $items['message_type_email'] = entity_import('message_type_category', '{
-    "category" : "message_type_email",
-    "description" : "Message type email",
-    "statusKey" : "status",
-    "rdf_mapping" : []
-  }');
-  return $items;
-}
-
-/**
  * Implements hook_mail().
  *
  * Set's the message subject and body as configured.
@@ -116,23 +102,18 @@ function message_notify_field_attach_create_bundle($entity_type, $bundle) {
     return;
   }
 
-  $message_type = message_type_load($bundle);
-  if ($message_type->category != 'message_type_email') {
-    return;
-  }
-
   $bundle_settings = field_bundle_settings('message', $bundle);
   $display = &$bundle_settings['extra_fields']['display'];
 
   $visible = array('visible' => TRUE, 'weight' => 0);
   $hidden = array('visible' => FALSE, 'weight' => 0);
 
-  $display['message__message_text_subject__0'] = array(
+  $display['message__message_text__0'] = array(
     'message_notify_email_subject' => $visible,
     'message_notify_email_body' => $hidden,
   );
 
-  $display['message__message_text__0'] = array(
+  $display['message__message_text__1'] = array(
     'message_notify_email_subject' => $hidden,
     'message_notify_email_body' => $visible,
   );

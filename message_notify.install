@@ -6,54 +6,6 @@
  */
 
 /**
- * Implements hook_install().
- */
-function message_notify_install() {
-  // Create instance of the message text in our custom bundle.
-  $instance = array(
-    'field_name' => MESSAGE_FIELD_MESSAGE_TEXT,
-    'bundle' => 'message_type_email',
-    'entity_type' => 'message_type',
-    'label' => t('Message email body'),
-    'description' => t('This is the body of the email.'),
-    'required' => TRUE,
-    'settings' => array(
-      'text_processing' => 1,
-    ),
-  );
-  field_create_instance($instance);
-
-  // Create the field holding the message email "subject", in our custom bundle.
-  $field = array(
-    'field_name' => 'message_text_subject',
-    'type' => 'text',
-    'entity_types' => array('message_type'),
-    'cardinality' => 1,
-    'translatable' => TRUE,
-    'locked' => TRUE,
-    'settings' => array(
-      // Mark that this field can be rendered using Message::getText().
-      'message_text' => TRUE,
-    ),
-  );
-  $field = field_create_field($field);
-
-  $instance = array(
-    'field_name' => 'message_text_subject',
-    'bundle' => 'message_type_email',
-    'entity_type' => 'message_type',
-    'label' => t('Message email subject'),
-    'description' => t('This is the subject of the email.'),
-    'required' => TRUE,
-    'widget' => array(
-      // Position above the text field.
-      'weight' => -10,
-    ),
-  );
-  field_create_instance($instance);
-}
-
-/**
  * Implements hook_uninstall().
  */
 function message_notify_uninstall() {
@@ -85,4 +37,61 @@ function message_notify_update_7002() {
   $field = field_info_field('message_text_subject');
   $field['settings']['message_text'] = TRUE;
   field_update_field($field);
+}
+
+/**
+ * Remove the deprecated "Subject" field.
+ */
+function message_notify_update_7003(&$sandbox) {
+  $field = field_info_field('message_text');
+  if ($field['storage']['type'] !== 'field_sql_storage') {
+    // Field doesn't use SQL storage, we cannot modify the schema.
+    return;
+  }
+
+  $count = db_select('message_type')
+    ->condition('category', 'message_type_email')
+    ->countQuery()
+    ->execute()
+    ->fetchField();
+
+  if (!$count) {
+    return;
+  }
+
+  // Add 1 to the delta, so we can add the subject field as delta 0.
+  $table_name = _field_sql_storage_tablename($field);
+  $revision_name = _field_sql_storage_revision_tablename($field);
+  foreach (array($table_name, $revision_name) as $table) {
+    db_query("UPDATE {$table} SET delta = delta + 1 WHERE bundle = 'message_type_email' ORDER BY entity_type, entity_id, language, delta DESC;");
+  }
+
+  $subject_field = field_info_field('message_text_subject');
+  $subject_table_name =  _field_sql_storage_tablename($subject_field);
+
+  $result = db_select($subject_table_name)
+  ->fields($subject_table_name)
+  ->execute()
+  ->fetchAll();
+
+  foreach ($result as $row) {
+    // Move the subject field values into the message-text field, as the
+    // first delta.
+    $row->message_text_value = $row->message_text_subject_value;
+    $row->message_text_format = $row->message_text_subject_format;
+    drupal_write_record($table_name, $row);
+    drupal_write_record($revision_name, $row);
+  }
+
+  // Change the message-type bundle.
+  db_update('message_type')
+    ->condition('category', 'message_type_email')
+    ->fields(array('category' => 'message_type'))
+    ->execute();
+
+  // Delete the subject field.
+  $instance = field_info_instance('message_type', 'message_text_subject', 'message_type_email');
+  field_delete_instance($instance);
+
+  return ('"Email" mesage-type category was deleted. All the values from the "Subject" field were migrated into "Message-text" field. You should adjust the Email related view-modes under "Manage display" tab of each message-type.');
 }
