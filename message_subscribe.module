@@ -18,13 +18,22 @@
  *   Optional; Array of options to pass to message_notify_send_message()
  *   keyed by the notifier name.
  * @param $subscribe_options
- *   Optional; Array with the following values:
+ *   Optional; Array with the following optional values:
  *   - "save message": Determine if the Message should be saved. Defaults
  *     to TRUE.
  *   - "skip context": Determine if extracting basic context should be
  *     skipped in message_subscribe_get_subscribers(). Defaults to FALSE.
  *   - "last uid": The last user ID to query.
+ *   - "uids": Array of user IDs to be processed. Setting this, will cause
+ *     skipping message_subscribe_get_subscribers() to get the subscribed
+ *     users.
  *   - "range": The number of items to fetch in the query.
+ *   - "end time": The timestamp of the time limit for the function to
+ *     execute. Defaults to FALSE, meaning there is no time limitation.
+ *   - "use queue": Determine if advanced-queue module should be used to
+ *     send messages. Defautls to FALSE.
+ *   - "queue": Array with all the information needed to work with the
+ *     queue. see message_subscribe_advancedqueue_worker().
  * @param $context
  *   Optional; Array keyed with the entity type and array of entity IDs as
  *   the value. For example, if the event is related to a node
@@ -45,31 +54,83 @@
  *   The message object.
  */
 function message_subscribe_process_message($entity_type, $entity, Message $message, $notify_options = array(), $subscribe_options = array(), $context = array()) {
+  $use_queue = FALSE;
+  if (module_exists('advancedqueue')) {
+    $use_queue = isset($subscribe_options['use queue']) ? $subscribe_options['use queue'] : variable_get('message_subscribe_use_queue', FALSE);
+  }
+
   // Save message by default.
   $subscribe_options += array(
     'save message' => TRUE,
     'skip context' => FALSE,
     'last uid' => 0,
-    'range' => FALSE,
+    'uids' => array(),
+    'range' => $use_queue ? 100 : FALSE,
+    'end time' => FALSE,
+    'use queue' => $use_queue,
+    'queue' => array(),
   );
 
   if (empty($message->mid) && $subscribe_options['save message']) {
     $message->save();
   }
 
+  if ($use_queue && empty($subscribe_options['queue'])) {
+    if (empty($message->mid)) {
+      throw new Exception('Cannot add a non-saved message to the queue.');
+    }
+
+    list($id) = entity_extract_ids($entity_type, $entity);
+    // Get the context once, so we don't need to process it every time
+    // a worker claims the item.
+    $context = message_subscribe_get_basic_context($entity_type, $entity, $subscribe_options, $context);
+    $subscribe_options['skip context'] = TRUE;
+
+    // Add item to the queue.
+    $queue = DrupalQueue::get('message_subscribe');
+    $task = array(
+      'mid' => $message->mid,
+      'uid' => $subscribe_options['last uid'],
+      'entity_type' => $entity_type,
+      'entity_id' => $id,
+      'notify_options' => $notify_options,
+      'subscribe_options' => $subscribe_options,
+      'context' => $context,
+      'title' => 'Message ' . $message->mid,
+    );
+
+    // Exit now, as messsages will be processed via advanced-queue.
+    return $queue->createItem($task);
+  }
+
   $message->message_subscribe = array();
 
   // Retrieve all users subscribed.
-  if (!$uids = message_subscribe_get_subscribers($entity_type, $entity, $message, $subscribe_options, $context)) {
+  $uids = array();
+  if ($subscribe_options['uids']) {
+    // We got a list of user IDs directly from the implementing module,
+    // However we need to adhere to the range.
+    $uids = $subscribe_options['range'] ? array_slice($subscribe_options['uids'], 0, $subscribe_options['range'], TRUE): $subscribe_options['uids'];
+  }
+  if (empty($uids) && !$uids = message_subscribe_get_subscribers($entity_type, $entity, $message, $subscribe_options, $context)) {
+    if ($use_queue) {
+      // We can delete the item from the queue.
+      $queue = DrupalQueue::get('message_subscribe');
+      $queue->deleteItem($subscribe_options['queue']['item']);
+    }
     return $message;
   }
 
+
   foreach ($uids as $uid => $values) {
+    $last_uid = $uid;
     // Clone the message in case it will need to be saved, it won't
     // overwrite the existing one.
     $cloned_message = clone $message;
     unset($cloned_message->mid);
     $cloned_message->uid = $uid;
+
+    $values += array('notifiers' => array());
 
     // Send the message using the required notifiers.
     foreach ($values['notifiers'] as $notifier_name) {
@@ -80,15 +141,30 @@ function message_subscribe_process_message($entity_type, $entity, Message $messa
       );
 
       message_notify_send_message($cloned_message, $options, $notifier_name);
+
+      // Check we didn't timeout.
+      if ($use_queue && $subscribe_options['queue']['end date'] && time() < $subscribe_options['queue']['end date']) {
+        continue 2;
+      }
     }
   }
 
-  // Add the context and the user IDs to the message for further
-  // processing.
-  $message->message_subscribe = array(
-    'context' => $context,
-    'uids' => $uids,
-  );
+  if ($use_queue) {
+    // Update the last user ID in the item.
+    $item = $subscribe_options['queue']['item'];
+    $item->data['last uid'] = $last_uid;
+
+    db_update('advancedqueue')
+      ->fields(array(
+        'data' => serialize($item->data),
+      ))
+      ->condition('item_id', $item->item_id)
+      ->execute();
+
+    // Release the item.
+    $queue = DrupalQueue::get('message_subscribe');
+    $queue->releaseItem($item);
+  }
 
   return $message;
 }
@@ -356,7 +432,6 @@ function message_subscribe_flag_get_flags($content_type = NULL, $content_subtype
   return $ms_flags;
 }
 
-
 /**
  * Implements hook_flag_default_flags().
  */
@@ -527,4 +602,39 @@ function _message_subscribe_add_default_notifiers(&$uids) {
   foreach ($uids as $delta => $uid) {
     $uids[$delta]['notifiers'] += $notifiers;
   }
+}
+
+
+/**
+ * Implements hook_advanced_queue_info().
+ */
+function message_subscribe_advanced_queue_info() {
+  $items['message_subscribe'] = array(
+    'worker callback' => 'message_subscribe_advancedqueue_worker',
+    // Message-subscribe will deal itself with deleting claimed items.
+    'delete when completed' => FALSE,
+  );
+  return $items;
+}
+
+/**
+ * Advanced queue worker; Process a queue item.
+ *
+ * The item holds the Message ID, and user ID of the last user the email
+ * was sent to.
+ */
+function message_subscribe_advancedqueue_worker($item, $end_time = FALSE) {
+  $data = $item->data;
+
+  extract($data);
+
+  $entity = entity_load_single($entity_type, $data['entity_id']);
+  $message = message_load($data['mid']);
+
+  $subscribe_options['queue'] = array(
+    'item' => $item,
+    'end time' => $end_time,
+  );
+  message_subscribe_process_message($entity_type, $entity, $message, $notify_options, $subscribe_options, $context);
+  return TRUE;
 }

@@ -257,3 +257,99 @@ class MessageSubscribeSubscribersTest extends DrupalWebTestCase {
     $this->assertEqual(array_keys($uids), array($user3->uid), 'All subscribers from "last uid" and "range" were fetched.');
   }
 }
+
+
+/**
+ * Test getting subscribes from context.
+ */
+class MessageSubscribeAdvancedQueueTest extends DrupalWebTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Advanced Queue',
+      'description' => 'Test sending messages using the AdvancedQueue module.',
+      'group' => 'Message subscribe',
+      'dependencies' => array('advancedqueue'),
+    );
+  }
+
+  function setUp() {
+    parent::setUp('message_subscribe', 'advancedqueue');
+
+    // Override default notifiers.
+    variable_set('message_subscribe_default_notifiers', array());
+
+    // Enable advanced-queue.
+    variable_set('message_subscribe_use_queue', TRUE);
+
+    // Create a dummy message-type.
+    $message_type = message_type_create('foo', array('message_text' => array(LANGUAGE_NONE => array(array('value' => 'Example text.')))));
+    $message_type->save();
+  }
+
+  function testAdvancedQueue() {
+    $user1 = $this->drupalCreateUser();
+
+   // Create node-type.
+    $type = $this->drupalCreateContentType();
+    $node_type = $type->type;
+
+    // Create node.
+    $settings = array();
+    $settings['type'] = $node_type;
+    $settings['uid'] = $user1->uid;
+    $node = $this->drupalCreateNode($settings);
+
+    $message = message_create('foo', array());
+
+    $subscribe_options = array();
+    $subscribe_options['save message'] = FALSE;
+
+    try {
+      $message = message_subscribe_process_message('node', $node, $message, array(), $subscribe_options);
+      $this->fail('Can add a non-saved message to the queue.');
+    }
+    catch (Exception $e) {
+      $this->pass('Cannot add a non-saved message to the queue.');
+    }
+
+    // Assert message was saved and added to queue.
+    $uids = array_fill(1, 10, array());
+    $subscribe_options = array(
+      'uids' => $uids,
+      'skip context' => TRUE,
+      'range' => 3,
+    );
+    $queue = DrupalQueue::get('message_subscribe');
+    $this->assertEqual($queue->numberOfItems(), 0, 'Queue is empty');
+    message_subscribe_process_message('node', $node, $message, array(), $subscribe_options);
+    $this->assertTrue($message->mid, 'Message was saved');
+    $this->assertEqual($queue->numberOfItems(), 1, 'Message added to queue.');
+
+    // Assert queue-item is processed and updated. We mock subscription
+    // of users to the message. It will not be sent, as the default
+    // notifier is disabled.
+    $item = $queue->claimItem();
+    $item_id = $item->item_id;
+
+    // Add the queue information, and the user IDs to process.
+    $subscribe_options['queue'] = array(
+      'uids' => $uids,
+      'item' => $item,
+      'end time' => FALSE,
+    );
+
+    message_subscribe_process_message('node', $node, $message, array(), $subscribe_options);
+
+    // Reclaim the item, assert it is the same one, and that the last UID
+    // was updated.
+    $item = $queue->claimItem();
+    $this->assertEqual($item_id, $item->item_id, 'Queue item was updated.');
+    $this->assertEqual($item->data['last uid'], 3, 'Last processed user ID was updated.');
+
+    // Assert queue-item is deleted.
+    $subscribe_options['uids'] = array();
+    message_subscribe_process_message('node', $node, $message, array(), $subscribe_options);
+    $this->assertEqual($queue->numberOfItems(), 0, 'Message removed from queue.');
+  }
+}
