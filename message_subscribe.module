@@ -75,6 +75,10 @@ function message_subscribe_process_message($entity_type, $entity, Message $messa
     $message->save();
   }
 
+  if ($use_queue) {
+    $queue = DrupalQueue::get('message_subscribe');
+  }
+
   if ($use_queue && empty($subscribe_options['queue'])) {
     if (empty($message->mid)) {
       throw new Exception('Cannot add a non-saved message to the queue.');
@@ -87,16 +91,16 @@ function message_subscribe_process_message($entity_type, $entity, Message $messa
     $subscribe_options['skip context'] = TRUE;
 
     // Add item to the queue.
-    $queue = DrupalQueue::get('message_subscribe');
     $task = array(
       'mid' => $message->mid,
-      'uid' => $subscribe_options['last uid'],
       'entity_type' => $entity_type,
       'entity_id' => $id,
       'notify_options' => $notify_options,
       'subscribe_options' => $subscribe_options,
       'context' => $context,
       'title' => 'Message ' . $message->mid,
+      // Add the user ID for the queue.
+      'uid' => $subscribe_options['last uid'],
     );
 
     // Exit now, as messsages will be processed via advanced-queue.
@@ -112,10 +116,10 @@ function message_subscribe_process_message($entity_type, $entity, Message $messa
     // However we need to adhere to the range.
     $uids = $subscribe_options['range'] ? array_slice($subscribe_options['uids'], 0, $subscribe_options['range'], TRUE): $subscribe_options['uids'];
   }
+
   if (empty($uids) && !$uids = message_subscribe_get_subscribers($entity_type, $entity, $message, $subscribe_options, $context)) {
     if ($use_queue) {
       // We can delete the item from the queue.
-      $queue = DrupalQueue::get('message_subscribe');
       $queue->deleteItem($subscribe_options['queue']['item']);
     }
     return $message;
@@ -143,7 +147,7 @@ function message_subscribe_process_message($entity_type, $entity, Message $messa
       message_notify_send_message($cloned_message, $options, $notifier_name);
 
       // Check we didn't timeout.
-      if ($use_queue && $subscribe_options['queue']['end date'] && time() < $subscribe_options['queue']['end date']) {
+      if ($use_queue && $subscribe_options['queue']['end time'] && time() < $subscribe_options['queue']['end time']) {
         continue 2;
       }
     }
@@ -152,7 +156,10 @@ function message_subscribe_process_message($entity_type, $entity, Message $messa
   if ($use_queue) {
     // Update the last user ID in the item.
     $item = $subscribe_options['queue']['item'];
-    $item->data['last uid'] = $last_uid;
+    $item->data['subscribe_options']['last uid'] = $last_uid;
+    // Unset the "item" from the queue, so it won't be saved.
+    unset($subscribe_options['queue']['item']);
+    unset($subscribe_options['queue']['end time']);
 
     db_update('advancedqueue')
       ->fields(array(
@@ -162,7 +169,6 @@ function message_subscribe_process_message($entity_type, $entity, Message $messa
       ->execute();
 
     // Release the item.
-    $queue = DrupalQueue::get('message_subscribe');
     $queue->releaseItem($item);
   }
 
@@ -631,10 +637,9 @@ function message_subscribe_advancedqueue_worker($item, $end_time = FALSE) {
   $entity = entity_load_single($entity_type, $data['entity_id']);
   $message = message_load($data['mid']);
 
-  $subscribe_options['queue'] = array(
-    'item' => $item,
-    'end time' => $end_time,
-  );
+  $subscribe_options['queue']['item'] = $item;
+  $subscribe_options['queue']['end time'] = !empty($end_time) ? $end_time : FALSE;
+
   message_subscribe_process_message($entity_type, $entity, $message, $notify_options, $subscribe_options, $context);
   return TRUE;
 }

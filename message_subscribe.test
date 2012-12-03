@@ -345,7 +345,7 @@ class MessageSubscribeAdvancedQueueTest extends DrupalWebTestCase {
     // was updated.
     $item = $queue->claimItem();
     $this->assertEqual($item_id, $item->item_id, 'Queue item was updated.');
-    $this->assertEqual($item->data['last uid'], 3, 'Last processed user ID was updated.');
+    $this->assertEqual($item->data['subscribe_options']['last uid'], 3, 'Last processed user ID was updated.');
 
     // Assert queue-item is deleted.
     $subscribe_options['uids'] = array();
