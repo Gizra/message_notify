@@ -12,7 +12,7 @@ include_once 'message_subscribe_ui.features.inc';
 function message_subscribe_ui_menu() {
   $items = array();
   $items['user/%user/message-subscribe'] = array(
-    'title' => 'Message subscribe',
+    'title' => 'Subscriptions',
     'type' => MENU_LOCAL_TASK,
     'page callback' => 'message_subscribe_ui_tab',
     'page arguments' => array(1),
