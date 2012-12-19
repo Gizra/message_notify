@@ -158,23 +158,36 @@ function message_subscribe_ui_tab($account, $flag_name = NULL) {
 
   // Change the flag's relationship to point to our flag.
   $relationships = $view->display_handler->get_option('relationships');
-  // Determine if a relationship was set.
-  $rel_set = FALSE;
   foreach ($relationships as $key => $relationship) {
-    if (strpos($key, 'flag_') === 0) {
-      // Check that the flag is valid.
-      $rel_flag = flag_get_flag($relationship['flag']);
-      if (empty($rel_flag) || (isset($rel_flag->status) && $rel_flag->status === FALSE)) {
-        $params = array('%name' => $relationship['flag']);
-        watchdog('message_sbuscribe', t('Flag %name is not setup corrcetly. It is probably disabled or have no bundles configured.'), $params);
-        return drupal_set_message(t('There Flag %name is not configured correctly.', $params), 'error');
-      }
+    if (strpos($key, 'flag_') !== 0) {
+      // Not a flag relationship.
+      continue;
+    }
 
-      if (!$rel_set) {
-        $rel_set = TRUE;
-        $relationships[$key]['flag'] = $flag_name;
-        $view->display_handler->set_option('relationships', $relationships);
-      }
+    // Check that the flag is valid.
+    $rel_flag = flag_get_flag($relationship['flag']);
+    if (empty($rel_flag) || (isset($rel_flag->status) && $rel_flag->status === FALSE)) {
+      $params = array('%name' => $relationship['flag']);
+      watchdog('message_sbuscribe', t('Flag %name is not setup corrcetly. It is probably disabled or have no bundles configured.'), $params);
+      return drupal_set_message(t('Flag %name is not setup corrcetly. It is probably disabled or have no bundles configured.', $params), 'error');
+    }
+
+    // Indicate we need to set the relationship.
+    $rel_set = FALSE;
+
+    if (strpos($relationship['flag'], $prefix) === 0) {
+      // "Subscribe" flag.
+      $rel_set = TRUE;
+    }
+    elseif (strpos($relationship['flag'], 'email') === 0) {
+      // "Email" flag.
+      $rel_set = TRUE;
+      $flag_name = 'email_' . str_replace($prefix, '', $flag_name);
+    }
+
+    if ($rel_set) {
+      $relationships[$key]['flag'] = $flag_name;
+      $view->display_handler->set_option('relationships', $relationships);
     }
   }
 
