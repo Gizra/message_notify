@@ -54,6 +54,14 @@ function message_notify_rules_action_info() {
         'optional' => TRUE,
         'options list' => 'message_notify_field_text_list',
       ),
+      'mail' => array(
+        'type' => 'text',
+        'label' => t('The recipient of the email'),
+        'description' => t('The recipient of the email. If left empty, the mail will be sent to the author of the message'),
+        'default value' => FALSE,
+        'allow null' => TRUE,
+        'optional' => TRUE,
+      ),
     ),
     'base' => 'message_notify_rules_process',
   );
@@ -64,7 +72,7 @@ function message_notify_rules_action_info() {
 /**
  * Action: Process and send Message.
  */
-function message_notify_rules_process(Message $message, $save_on_fail, $save_on_success, $rendered_subject_field, $rendered_body_field) {
+function message_notify_rules_process(Message $message, $save_on_fail, $save_on_success, $rendered_subject_field, $rendered_body_field, $mail = FALSE) {
   $options = array(
     'save on fail' => $save_on_fail,
     'save on success' => $save_on_success,
@@ -76,6 +84,11 @@ function message_notify_rules_process(Message $message, $save_on_fail, $save_on_
       'message_notify_email_body' => $rendered_body_field,
     );
   }
+
+  if ($mail) {
+    $options['mail'] =  str_replace(array("\r", "\n"), '', $mail);
+  }
+
   message_notify_send_message($message, $options, 'email');
 }
 
