@@ -1,6 +1,5 @@
 name = Message subscribe email
 core = 7.x
-package = Features
 php = 5.2.4
 version = 7.x-1.0
 project = message_subscribe_email
@@ -8,8 +7,3 @@ dependencies[] = flag
 dependencies[] = list
 dependencies[] = message_subscribe_ui
 dependencies[] = views
-features[ctools][] = views:views_default:3.0
-features[features_api][] = api:1
-features[views_view][] = subscribe_node_email
-features[views_view][] = subscribe_taxonomy_term_email
-features[views_view][] = subscribe_user_email
