@@ -34,6 +34,8 @@
  *     send messages. Defautls to FALSE.
  *   - "queue": Array with all the information needed to work with the
  *     queue. see message_subscribe_advancedqueue_worker().
+ *   - "entity access": Determine if access to view the entity should be applied
+ *     when getting the list of subscribed users. Defaults to TRUE.
  * @param $context
  *   Optional; Array keyed with the entity type and array of entity IDs as
  *   the value. For example, if the event is related to a node
@@ -69,6 +71,7 @@ function message_subscribe_process_message($entity_type, $entity, Message $messa
     'end time' => FALSE,
     'use queue' => $use_queue,
     'queue' => array(),
+    'entity access' => TRUE,
   );
 
   if (empty($message->mid) && $subscribe_options['save message']) {
@@ -213,6 +216,13 @@ function message_subscribe_get_subscribers($entity_type, $entity, Message $messa
     $function = $module . '_message_subscribe_get_subscribers';
     $result = $function($message, $subscribe_options, $context);
     foreach ($result as $uid => $values) {
+      if (!empty($subscribe_options['entity access'])) {
+        $account = user_load($uid);
+        if (!entity_access('view', $entity_type, $entity, $account)) {
+          // User doesn't have access to view the entity.
+          continue;
+        }
+      }
       $uids[$uid] = $values;
     }
   }

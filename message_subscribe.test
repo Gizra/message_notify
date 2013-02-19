@@ -170,8 +170,7 @@ class MessageSubscribeSubscribersTest extends DrupalWebTestCase {
     $user2 = $this->drupalCreateUser();
 
     // Create node-type.
-    $type = $this->drupalCreateContentType();
-    $node_type = $type->type;
+    $node_type = 'article';
 
     // Create node.
     $settings = array();
@@ -208,13 +207,16 @@ class MessageSubscribeSubscribersTest extends DrupalWebTestCase {
     $this->node = $node;
     $this->user1 = $user1;
     $this->user2 = $user2;
-  }
-
-  function testGetSubscribers() {
-    $message = message_create('foo', array());
 
     // Override default notifiers.
     variable_set('message_subscribe_default_notifiers', array());
+  }
+
+  /**
+   * Test getting the subscribers list.
+   */
+  function testGetSubscribers() {
+    $message = message_create('foo', array());
 
     $node = $this->node;
     $user1 = $this->user1;
@@ -255,6 +257,32 @@ class MessageSubscribeSubscribersTest extends DrupalWebTestCase {
     $subscribe_options['range'] = 1;
     $uids = message_subscribe_get_subscribers('node', $node, $message, $subscribe_options);
     $this->assertEqual(array_keys($uids), array($user3->uid), 'All subscribers from "last uid" and "range" were fetched.');
+  }
+
+  /**
+   * Assert subscribers list is entity-access aware.
+   */
+  function testEntityAccess() {
+    $message = message_create('foo', array());
+
+    $node = $this->node;
+    $node->status = NODE_NOT_PUBLISHED;
+    node_save($node);
+
+    // Add permission to view own unpublished content.
+    user_role_change_permissions(DRUPAL_AUTHENTICATED_RID, array('view own unpublished content' => TRUE));
+
+    // Set the node to be unpublished.
+    $user1 = $this->user1;
+    $user2 = $this->user2;
+
+    $subscribe_options['entity access'] = TRUE;
+    $uids = message_subscribe_get_subscribers('node', $node, $message, $subscribe_options);
+    $this->assertEqual(array_keys($uids), array($user1->uid), 'Only user with access to node returned for subscribers list.');
+
+    $subscribe_options['entity access'] = FALSE;
+    $uids = message_subscribe_get_subscribers('node', $node, $message, $subscribe_options);
+    $this->assertEqual(array_keys($uids), array($user1->uid, $user2->uid), 'All users (even without access) returned for subscribers list.');
   }
 }
 
