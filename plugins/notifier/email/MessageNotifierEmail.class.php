@@ -5,16 +5,6 @@
  */
 class MessageNotifierEmail extends MessageNotifierBase {
 
-  /**
-   * Add Message notify view mode.
-   */
-  public static function viewModes() {
-    return array(
-      'message_notify_email_subject' => array('label' => t('Notify - Email subject')),
-      'message_notify_email_body' => array('label' => t('Notify - Email body')),
-    );
-  }
-
   public function deliver(array $output = array()) {
     $plugin = $this->plugin;
     $message = $this->message;

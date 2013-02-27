@@ -45,13 +45,6 @@ interface MessageNotifierInterface {
    * Determine if user can access notifier.
    */
   public function access();
-
-  /**
-   * Allow notifier to define its own view modes.
-   *
-   * Those view modes are later going to be rendered and sent.
-   */
-  public static function viewModes();
 }
 
 /**
@@ -77,7 +70,7 @@ abstract class MessageNotifierBase implements MessageNotifierInterface {
   public function send() {
     $message = $this->message;
     $output = array();
-    foreach ($this->viewModes() as $view_mode => $value) {
+    foreach ($this->plugin['view_modes'] as $view_mode => $value) {
       $content = $message->buildContent($view_mode);
       $output[$view_mode] = render($content);
     }
@@ -113,7 +106,7 @@ abstract class MessageNotifierBase implements MessageNotifierInterface {
     if ($options['rendered fields']) {
       // Save the rendered output into matching fields.
       $wrapper = entity_metadata_wrapper('message', $message);
-      foreach ($this->viewModes() as $view_mode => $mode) {
+      foreach ($this->plugin['view_modes'] as $view_mode => $mode) {
         if (empty($options['rendered fields'][$view_mode])) {
           throw new MessageNotifyException(format_string('The rendered view mode @mode cannot be saved to field, as there is not a matching one.', array('@mode' => $mode['label'])));
         }
@@ -143,9 +136,4 @@ abstract class MessageNotifierBase implements MessageNotifierInterface {
   public function access() {
     return TRUE;
   }
-
-  public static function viewModes() {
-    return array();
-  }
-
 }

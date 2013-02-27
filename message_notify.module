@@ -70,9 +70,8 @@ function message_notify_plugin_process(&$plugin, $info) {
  * Add a the notifiers view modes.
  */
 function message_notify_entity_info_alter(&$entity_info) {
-  foreach (message_notify_get_notifiers() as $notifier_name => $plugin) {
-    $class = ctools_plugin_load_class('message_notify', 'notifier', $notifier_name, 'class');
-    $view_modes = call_user_func(array($class, 'viewModes'));
+  foreach (message_notify_get_notifiers() as $plugin) {
+    $view_modes = $plugin['view_modes'];
     // Set default values.
     foreach ($view_modes as &$view_mode) {
       $view_mode += array('custom settings' => TRUE);
