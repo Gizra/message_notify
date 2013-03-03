@@ -21,6 +21,9 @@ interface MessageNotifierInterface {
 
   /**
    * Entry point to send and process a message.
+   *
+   * @return
+   *   TRUE or FALSE based on delivery status.
    */
   public function send();
 
@@ -76,6 +79,7 @@ abstract class MessageNotifierBase implements MessageNotifierInterface {
     }
     $result = $this->deliver($output);
     $this->postSend($result, $output);
+    return $result;
   }
 
   public function deliver(array $output = array()) {}

@@ -28,7 +28,8 @@ class MessageNotifierEmail extends MessageNotifierBase {
     // Pass the message entity along to hook_drupal_mail().
     $output['message_entity'] = $message;
 
-    return drupal_mail('message_notify', $message->type, $mail, $lang, $output);
+    $result =  drupal_mail('message_notify', $message->type, $mail, $lang, $output);
+    return $result['result'];
   }
 
 }
