@@ -620,6 +620,24 @@ function _message_subscribe_add_default_notifiers(&$uids) {
   }
 }
 
+/**
+ * Implements hook_menu().
+ */
+function message_subscribe_menu() {
+  $items = array();
+
+  $items['admin/config/system/message-subscribe'] = array(
+    'title' => 'Message subscribe settings',
+    'description' => 'Administer message subscribe',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('message_subscribe_admin_settings'),
+    'access arguments' => array('administer message subscribe'),
+    'file' => 'includes/message_subscribe.admin.inc',
+  );
+
+  return $items;
+}
+
 
 /**
  * Implements hook_advanced_queue_info().

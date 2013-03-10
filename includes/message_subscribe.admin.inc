@@ -8,7 +8,7 @@
 /**
  * Menu callback; Admin settings form.
  */
-function message_subscribe_ui_admin_settings() {
+function message_subscribe_admin_settings() {
   $form['message_subscribe_default_notifiers'] = array(
     '#type' => 'select',
     '#title' => t('Default message notifiers'),
@@ -49,7 +49,6 @@ function message_subscribe_ui_admin_settings() {
     '#title' => t('Use queue'),
     '#description' => t('Use "Advanced-Queue" module to process the Messages.'),
     '#default_value' => variable_get('message_subscribe_use_queue', FALSE),
-    '#disabled' => !module_exists('advancedqueue'),
   );
 
   return system_settings_form($form);

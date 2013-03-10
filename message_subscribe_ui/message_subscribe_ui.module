@@ -34,15 +34,6 @@ function message_subscribe_ui_menu() {
     );
   }
 
-  $items['admin/config/system/message-subscribe'] = array(
-    'title' => 'Message subscribe settings',
-    'description' => 'Adminsiter message subscribe',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('message_subscribe_ui_admin_settings'),
-    'access arguments' => array('administer message subscribe'),
-    'file' => 'includes/message_subscribe_ui.admin.inc',
-  );
-
   return $items;
 }
 
