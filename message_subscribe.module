@@ -30,10 +30,9 @@
  *   - "range": The number of items to fetch in the query.
  *   - "end time": The timestamp of the time limit for the function to
  *     execute. Defaults to FALSE, meaning there is no time limitation.
- *   - "use queue": Determine if advanced-queue module should be used to
- *     send messages. Defautls to FALSE.
- *   - "queue": Array with all the information needed to work with the
- *     queue. see message_subscribe_advancedqueue_worker().
+ *   - "use queue": Determine if queue API should be used to
+ *   - "queue": Set to TRUE to indicate the processing is done via a queue
+ *     worker. see message_subscribe_queue_worker().
  *   - "entity access": Determine if access to view the entity should be applied
  *     when getting the list of subscribed users. Defaults to TRUE.
  * @param $context
@@ -56,10 +55,7 @@
  *   The message object.
  */
 function message_subscribe_process_message($entity_type, $entity, Message $message, $notify_options = array(), $subscribe_options = array(), $context = array()) {
-  $use_queue = FALSE;
-  if (module_exists('advancedqueue')) {
-    $use_queue = isset($subscribe_options['use queue']) ? $subscribe_options['use queue'] : variable_get('message_subscribe_use_queue', FALSE);
-  }
+  $use_queue = isset($subscribe_options['use queue']) ? $subscribe_options['use queue'] : variable_get('message_subscribe_use_queue', FALSE);
 
   // Save message by default.
   $subscribe_options += array(
@@ -70,7 +66,7 @@ function message_subscribe_process_message($entity_type, $entity, Message $messa
     'range' => $use_queue ? 100 : FALSE,
     'end time' => FALSE,
     'use queue' => $use_queue,
-    'queue' => array(),
+    'queue' => FALSE,
     'entity access' => TRUE,
   );
 
@@ -80,6 +76,7 @@ function message_subscribe_process_message($entity_type, $entity, Message $messa
 
   if ($use_queue) {
     $queue = DrupalQueue::get('message_subscribe');
+    list($id) = entity_extract_ids($entity_type, $entity);
   }
 
   if ($use_queue && empty($subscribe_options['queue'])) {
@@ -87,7 +84,6 @@ function message_subscribe_process_message($entity_type, $entity, Message $messa
       throw new Exception('Cannot add a non-saved message to the queue.');
     }
 
-    list($id) = entity_extract_ids($entity_type, $entity);
     // Get the context once, so we don't need to process it every time
     // a worker claims the item.
     $context = message_subscribe_get_basic_context($entity_type, $entity, $subscribe_options, $context);
@@ -101,12 +97,11 @@ function message_subscribe_process_message($entity_type, $entity, Message $messa
       'notify_options' => $notify_options,
       'subscribe_options' => $subscribe_options,
       'context' => $context,
-      'title' => 'Message ' . $message->mid,
       // Add the user ID for the queue.
       'uid' => $subscribe_options['last uid'],
     );
 
-    // Exit now, as messsages will be processed via advanced-queue.
+    // Exit now, as messages will be processed via queue API.
     return $queue->createItem($task);
   }
 
@@ -121,10 +116,7 @@ function message_subscribe_process_message($entity_type, $entity, Message $messa
   }
 
   if (empty($uids) && !$uids = message_subscribe_get_subscribers($entity_type, $entity, $message, $subscribe_options, $context)) {
-    if ($use_queue) {
-      // We can delete the item from the queue.
-      $queue->deleteItem($subscribe_options['queue']['item']);
-    }
+    // If we use a queue, it will be deleted.
     return $message;
   }
 
@@ -157,22 +149,21 @@ function message_subscribe_process_message($entity_type, $entity, Message $messa
   }
 
   if ($use_queue) {
-    // Update the last user ID in the item.
-    $item = $subscribe_options['queue']['item'];
-    $item->data['subscribe_options']['last uid'] = $last_uid;
-    // Unset the "item" from the queue, so it won't be saved.
-    unset($subscribe_options['queue']['item']);
-    unset($subscribe_options['queue']['end time']);
+    // Add item to the queue.
+    $task = array(
+      'mid' => $message->mid,
+      'entity_type' => $entity_type,
+      'entity_id' => $id,
+      'notify_options' => $notify_options,
+      'subscribe_options' => $subscribe_options,
+      'context' => $context,
+      'uid' => $last_uid,
+    );
 
-    db_update('advancedqueue')
-      ->fields(array(
-        'data' => serialize($item->data),
-      ))
-      ->condition('item_id', $item->item_id)
-      ->execute();
+    $task['subscribe_options']['last uid'] = $last_uid;
 
-    // Release the item.
-    $queue->releaseItem($item);
+    // Create a new queue item, with the last user ID.
+    $queue->createItem($task);
   }
 
   return $message;
@@ -640,34 +631,28 @@ function message_subscribe_menu() {
 
 
 /**
- * Implements hook_advanced_queue_info().
+ * Implements hook_cron_queue_info().
  */
-function message_subscribe_advanced_queue_info() {
+function message_subscribe_cron_queue_info() {
   $items['message_subscribe'] = array(
-    'worker callback' => 'message_subscribe_advancedqueue_worker',
-    // Message-subscribe will deal itself with deleting claimed items.
-    'delete when completed' => FALSE,
+    'title' => t('Message subscribe'),
+    'worker callback' => 'message_subscribe_queue_worker',
   );
   return $items;
 }
 
 /**
- * Advanced queue worker; Process a queue item.
+ * Queue API worker; Process a queue item.
  *
  * The item holds the Message ID, and user ID of the last user the email
  * was sent to.
  */
-function message_subscribe_advancedqueue_worker($item, $end_time = FALSE) {
-  $data = $item->data;
-
+function message_subscribe_queue_worker($data, $end_time = FALSE) {
   extract($data);
 
-  $entity = entity_load_single($entity_type, $data['entity_id']);
-  $message = message_load($data['mid']);
-
-  $subscribe_options['queue']['item'] = $item;
-  $subscribe_options['queue']['end time'] = !empty($end_time) ? $end_time : FALSE;
+  $entity = entity_load_single($entity_type, $entity_id);
+  $message = message_load($mid);
+  $subscribe_options['queue'] = TRUE;
 
   message_subscribe_process_message($entity_type, $entity, $message, $notify_options, $subscribe_options, $context);
-  return TRUE;
 }
