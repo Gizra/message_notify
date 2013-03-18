@@ -47,7 +47,7 @@ function message_subscribe_admin_settings() {
   $form['message_subscribe_use_queue'] = array(
     '#type' => 'checkbox',
     '#title' => t('Use queue'),
-    '#description' => t('Use "Advanced-Queue" module to process the Messages.'),
+    '#description' => t('Use the queue to process the Messages.'),
     '#default_value' => variable_get('message_subscribe_use_queue', FALSE),
   );
 

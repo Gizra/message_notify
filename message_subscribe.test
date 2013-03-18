@@ -306,7 +306,7 @@ class MessageSubscribeAdvancedQueueTest extends DrupalWebTestCase {
     // Override default notifiers.
     variable_set('message_subscribe_default_notifiers', array());
 
-    // Enable advanced-queue.
+    // Enable using queue.
     variable_set('message_subscribe_use_queue', TRUE);
 
     // Create a dummy message-type.
