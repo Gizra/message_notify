@@ -11,5 +11,5 @@ MAIN CONCEPTS
    subscription views to ones that include emails.
 3) You can use message_subscribe_get_subscribers() to get the list of email
    subscribers.
-4) Use message_subscribe_process_message() to handle emailing the list of
+4) Use message_subscribe_send_message() to handle emailing the list of
    subscribers.

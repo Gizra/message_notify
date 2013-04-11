@@ -333,7 +333,7 @@ class MessageSubscribeAdvancedQueueTest extends DrupalWebTestCase {
     $subscribe_options['save message'] = FALSE;
 
     try {
-      $message = message_subscribe_process_message('node', $node, $message, array(), $subscribe_options);
+      $message = message_subscribe_send_message('node', $node, $message, array(), $subscribe_options);
       $this->fail('Can add a non-saved message to the queue.');
     }
     catch (Exception $e) {
@@ -349,7 +349,7 @@ class MessageSubscribeAdvancedQueueTest extends DrupalWebTestCase {
     );
     $queue = DrupalQueue::get('message_subscribe');
     $this->assertEqual($queue->numberOfItems(), 0, 'Queue is empty');
-    message_subscribe_process_message('node', $node, $message, array(), $subscribe_options);
+    message_subscribe_send_message('node', $node, $message, array(), $subscribe_options);
     $this->assertTrue($message->mid, 'Message was saved');
     $this->assertEqual($queue->numberOfItems(), 1, 'Message added to queue.');
 
@@ -366,7 +366,7 @@ class MessageSubscribeAdvancedQueueTest extends DrupalWebTestCase {
       'end time' => FALSE,
     );
 
-    message_subscribe_process_message('node', $node, $message, array(), $subscribe_options);
+    message_subscribe_send_message('node', $node, $message, array(), $subscribe_options);
 
     // Reclaim the new item, and assert the "last UID" was updated.
     $item = $queue->claimItem();

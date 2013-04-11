@@ -7,7 +7,7 @@ MAIN CONCEPTS
 1) Every flag that is prefixed with "subscribe_" is considered a valid
    subscring-flag by this module. You can add as many flags as you wish.
 2) It is up to the the implementing module to create the Message entity,
-   and pass it along to message_subscribe_process_message(). From there
+   and pass it along to message_subscribe_send_message(). From there
    message-subscribe takes care of saving it, and sending it to the
    subscribed users.
 3) Getting the "subscribers" is a two step process:
