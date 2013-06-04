@@ -86,7 +86,8 @@ function message_subscribe_send_message($entity_type, $entity, Message $message,
 
     // Get the context once, so we don't need to process it every time
     // a worker claims the item.
-    $context = message_subscribe_get_basic_context($entity_type, $entity, $subscribe_options, $context);
+    $context = $context ? $context : message_subscribe_get_basic_context($entity_type, $entity, $subscribe_options, $context);
+
     $subscribe_options['skip context'] = TRUE;
 
     // Add item to the queue.
