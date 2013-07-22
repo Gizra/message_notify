@@ -98,7 +98,7 @@ class MessageSubscribeContextTest extends DrupalWebTestCase {
     og_group('node', $group->nid, array('entity_type' => 'node', 'entity' => $node));
 
     // Add comment.
-    $comment = (object)array(
+    $comment = (object) array(
       'subject' => 'topic',
       'nid' => $node->nid,
       'uid' => $user2->uid,
@@ -166,17 +166,8 @@ class MessageSubscribeSubscribersTest extends DrupalWebTestCase {
   function setUp() {
     parent::setUp('message_subscribe', 'flag', 'taxonomy');
 
-    $user1 = $this->drupalCreateUser();
-    $user2 = $this->drupalCreateUser();
-
     // Create node-type.
     $node_type = 'article';
-
-    // Create node.
-    $settings = array();
-    $settings['type'] = $node_type;
-    $settings['uid'] = $user1->uid;
-    $node = $this->drupalCreateNode($settings);
 
     // Enable flags.
     $flags = flag_get_default_flags(TRUE);
@@ -190,13 +181,34 @@ class MessageSubscribeSubscribersTest extends DrupalWebTestCase {
     $flag->save();
     $flag->enable();
 
-    // Reset flag's static variable.
+    // Reset our cache so our permissions show up.
     drupal_static_reset('flag_get_flags');
+
+    // Reset permissions so that permissions for this flag are available.
+    $this->checkPermissions(array(), TRUE);
+
+    $user1 = $this->drupalCreateUser(array(
+      'flag subscribe_node',
+      'unflag subscribe_node',
+      'flag subscribe_user',
+      'unflag subscribe_user'
+    ));
+    $user2 = $this->drupalCreateUser(array(
+      'flag subscribe_node',
+      'unflag subscribe_node',
+      'flag subscribe_user',
+      'unflag subscribe_user'
+    ));
+
+    // Create node.
+    $settings = array();
+    $settings['type'] = $node_type;
+    $settings['uid'] = $user1->uid;
+    $node = $this->drupalCreateNode($settings);
 
     // User1 and User2 flags node1.
     flag('flag', 'subscribe_node', $node->nid, $user1);
     flag('flag', 'subscribe_node', $node->nid, $user2);
-
     // User2 flags User1.
     flag('flag', 'subscribe_user', $user1->uid, $user2);
 
@@ -243,8 +255,18 @@ class MessageSubscribeSubscribersTest extends DrupalWebTestCase {
 
     $this->assertEqual($uids, $expected_uids, 'All expected subscribers were fetched.');
 
-    $user3 = $this->drupalCreateUser();
-    $user4 = $this->drupalCreateUser();
+    $user3 = $this->drupalCreateUser(array(
+      'flag subscribe_node',
+      'unflag subscribe_node',
+      'flag subscribe_user',
+      'unflag subscribe_user'
+    ));
+    $user4 = $this->drupalCreateUser(array(
+      'flag subscribe_node',
+      'unflag subscribe_node',
+      'flag subscribe_user',
+      'unflag subscribe_user'
+    ));
     flag('flag', 'subscribe_node', $node->nid, $user3);
     flag('flag', 'subscribe_node', $node->nid, $user4);
 
@@ -317,7 +339,7 @@ class MessageSubscribeAdvancedQueueTest extends DrupalWebTestCase {
   function testAdvancedQueue() {
     $user1 = $this->drupalCreateUser();
 
-   // Create node-type.
+    // Create node-type.
     $type = $this->drupalCreateContentType();
     $node_type = $type->type;
 

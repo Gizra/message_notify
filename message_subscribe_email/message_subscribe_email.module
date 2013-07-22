@@ -9,8 +9,11 @@
  */
 function message_subscribe_email_flag_access($flag, $content_id, $action, $account) {
   if (strpos($flag->name, 'email_') === 0) {
+
+    $entity_type = FLAG_API_VERSION == 3 ? $flag->entity_type : $flag->content_type;
+
     // Get the other flags on that same content.
-    $user_flags = flag_get_user_flags($flag->content_type, $content_id);
+    $user_flags = flag_get_user_flags($entity_type, $content_id);
 
     $name = str_replace('email_', '', $flag->name);
     $prefix = variable_get('message_subscribe_flag_prefix', 'subscribe') . '_';
@@ -93,8 +96,14 @@ function message_subscribe_email_message_subscribe_get_subscribers_alter(&$uids,
     $flag_ids[] = $flag->fid;
   }
 
-  $result = db_select('flag_content', 'f')
-    ->fields('f', array('uid'))
+  if (FLAG_API_VERSION == 2) {
+    $result = db_select('flag_content', 'f');
+  }
+  else {
+    $result = db_select('flagging', 'f');
+  }
+
+  $result->fields('f', array('uid'))
     ->condition('fid', $flag_ids, 'IN')
     ->condition('uid', array_keys($uids), 'IN')
     ->groupBy('uid')
@@ -122,7 +131,7 @@ function message_subscribe_email_flag_default_flags() {
   $flags = array();
   // Exported flag: "Email node".
   $flags['email_node'] = array(
-    'content_type' => 'node',
+    'entity_type' => 'node',
     'title' => 'Email content',
     'global' => '0',
     'types' => array(),
@@ -134,7 +143,7 @@ function message_subscribe_email_flag_default_flags() {
     'unflag_message' => '',
     'unflag_denied_text' => '',
     'link_type' => 'toggle',
-    'roles' => array(
+    'import_roles' => array(
       'flag' => array(
         0 => '2',
       ),
@@ -153,12 +162,12 @@ function message_subscribe_email_flag_default_flags() {
     'locked' => array(
       0 => 'name',
     ),
-    'api_version' => 2,
+    'api_version' => 3,
     'status' => FALSE,
   );
   // Exported flag: "Email term".
   $flags['email_term'] = array(
-    'content_type' => 'taxonomy_term',
+    'entity_type' => 'taxonomy_term',
     'title' => 'Email term',
     'global' => '0',
     'types' => array(),
@@ -170,7 +179,7 @@ function message_subscribe_email_flag_default_flags() {
     'unflag_message' => '',
     'unflag_denied_text' => '',
     'link_type' => 'toggle',
-    'roles' => array(
+    'import_roles' => array(
       'flag' => array(
         0 => '2',
       ),
@@ -186,12 +195,12 @@ function message_subscribe_email_flag_default_flags() {
     'locked' => array(
       0 => 'name',
     ),
-    'api_version' => 2,
+    'api_version' => 3,
     'status' => FALSE,
   );
   // Exported flag: "Email user".
   $flags['email_user'] = array(
-    'content_type' => 'user',
+    'entity_type' => 'user',
     'title' => 'Email user',
     'global' => '0',
     'types' => array(),
@@ -203,7 +212,7 @@ function message_subscribe_email_flag_default_flags() {
     'unflag_message' => '',
     'unflag_denied_text' => '',
     'link_type' => 'toggle',
-    'roles' => array(
+    'import_roles' => array(
       'flag' => array(
         0 => '2',
       ),
@@ -220,7 +229,7 @@ function message_subscribe_email_flag_default_flags() {
     'locked' => array(
       0 => 'name',
     ),
-    'api_version' => 2,
+    'api_version' => 3,
     'status' => FALSE,
   );
 
@@ -228,7 +237,7 @@ function message_subscribe_email_flag_default_flags() {
   if (module_exists('og')) {
     // Exported flag: "Email groups".
     $flags['email_og'] = array(
-      'content_type' => 'node',
+      'entity_type' => 'node',
       'title' => 'Email groups',
       'global' => '0',
       'types' => array(),
@@ -240,7 +249,7 @@ function message_subscribe_email_flag_default_flags() {
       'unflag_message' => 'You will no longer recieve emails about this item.',
       'unflag_denied_text' => '',
       'link_type' => 'toggle',
-      'roles' => array(
+      'import_roles' => array(
         'flag' => array(
           0 => '2',
         ),
@@ -259,9 +268,30 @@ function message_subscribe_email_flag_default_flags() {
       'locked' => array(
         0 => 'name',
       ),
-      'api_version' => 2,
+      'api_version' => 3,
       'status' => FALSE,
     );
+  }
+
+  if (FLAG_API_VERSION == 2) {
+
+    $flags['email_node']['api_version'] = $flags['email_term']['api_version'] = $flags['email_user']['api_version'] = 2;
+    $flags['email_node']['content_type'] = 'node';
+    $flags['email_term']['content_type'] = 'taxonomy_term';
+
+    $flags['email_node']['roles'] = $flags['email_node']['import_roles'];
+    $flags['email_term']['roles'] = $flags['email_term']['import_roles'];
+    $flags['email_user']['roles'] = $flags['email_user']['import_roles'];
+
+    unset($flags['email_node']['import_roles'], $flags['email_term']['import_roles'], $flags['email_user']['import_roles']);
+    unset($flags['email_node']['entity_type'], $flags['email_term']['entity_type'], $flags['email_user']['entity_type']);
+
+    if (module_exists('og')) {
+      $flags['email_og']['api_version'] = 2;
+      $flags['email_og']['content_type'] = 'node';
+      $flags['email_og']['roles'] = $flags['email_og']['import_roles'];
+      unset($flags['email_og']['entity_type'], $flags['email_og']['import_roles']);
+    }
   }
 
   return $flags;

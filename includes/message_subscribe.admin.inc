@@ -26,12 +26,14 @@ function message_subscribe_admin_settings() {
     $name = 'message_' . $flag->name;
     $params = array('@title' => $flag->title);
 
+    $entity_type = FLAG_API_VERSION == 3 ? $flag->entity_type : $flag->content_type;
+
     $form[$name] = array(
       '#type' => 'select',
       '#title' => t('View for flag <em>@title</em>', $params),
       '#description' => t('Select the View that should be used for flag @title.', $params),
       '#options' => views_get_views_as_options(),
-      '#default_value' => variable_get($name, $prefix . $flag->content_type . ':default'),
+      '#default_value' => variable_get($name, $prefix . $entity_type . ':default'),
       '#required' => TRUE,
     );
   }
