@@ -278,6 +278,7 @@ function message_subscribe_email_flag_default_flags() {
     $flags['email_node']['api_version'] = $flags['email_term']['api_version'] = $flags['email_user']['api_version'] = 2;
     $flags['email_node']['content_type'] = 'node';
     $flags['email_term']['content_type'] = 'taxonomy_term';
+    $flags['email_user']['content_type'] = 'user';
 
     $flags['email_node']['roles'] = $flags['email_node']['import_roles'];
     $flags['email_term']['roles'] = $flags['email_term']['import_roles'];

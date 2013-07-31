@@ -603,6 +603,7 @@ function message_subscribe_flag_default_flags() {
     $flags['subscribe_node']['api_version'] = $flags['subscribe_term']['api_version'] = $flags['subscribe_user']['api_version'] = 2;
     $flags['subscribe_node']['content_type'] = 'node';
     $flags['subscribe_term']['content_type'] = 'taxonomy_term';
+    $flags['subscribe_user']['content_type'] = 'user';
 
     $flags['subscribe_node']['roles'] = $flags['subscribe_node']['import_roles'];
     $flags['subscribe_term']['roles'] = $flags['subscribe_term']['import_roles'];
