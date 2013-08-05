@@ -1,0 +1,121 @@
+<?php
+
+/**
+ * @file
+ * Test for the Message subscribe email module.
+ */
+
+/**
+ * Test getting email subscribes from context.
+ */
+class MessageSubscribeEmailSubscribersTest extends DrupalWebTestCase {
+
+  public static function getInfo() {
+    return array(
+      'name' => 'Get email subscribers',
+      'description' => 'Get email subscribers from content.',
+      'group' => 'Message subscribe email',
+    );
+  }
+
+  function setUp() {
+    parent::setUp('message_subscribe_email', 'message_subscribe', 'flag');
+
+    // Create node-type.
+    $node_type = $this->drupalCreateContentType();
+    $node_type = $node_type->type;
+
+    // Enable flags.
+    $flags = flag_get_default_flags(TRUE);
+
+    $flag = $flags['subscribe_node'];
+    $flag->types[] = $node_type;
+    $flag->save();
+    $flag->enable();
+
+    $flag = $flags['email_node'];
+    $flag->types[] = $node_type;
+    $flag->save();
+    $flag->enable();
+
+    // Reset our cache so our permissions show up.
+    drupal_static_reset('flag_get_flags');
+
+    // Reset permissions so that permissions for this flag are available.
+    $this->checkPermissions(array(), TRUE);
+
+    $permissions = array(
+      'flag subscribe_node',
+      'unflag subscribe_node',
+      'flag email_node',
+      'unflag email_node',
+    );
+
+    $user1 = $this->drupalCreateUser($permissions);
+    $user2 = $this->drupalCreateUser($permissions);
+
+    // Create node.
+    $settings = array();
+    $settings['type'] = $node_type;
+    $settings['uid'] = $user1->uid;
+    $node = $this->drupalCreateNode($settings);
+
+    flag('flag', 'subscribe_node', $node->nid, $user1);
+    flag('flag', 'subscribe_node', $node->nid, $user2);
+
+    flag('flag', 'email_node', $node->nid, $user1);
+
+    // Create a dummy message-type.
+    $message_type = message_type_create('foo');
+    $message_type->save();
+
+    $this->node = $node;
+    $this->user1 = $user1;
+    $this->user2 = $user2;
+
+    // Override default notifiers.
+    variable_set('message_subscribe_default_notifiers', array());
+  }
+
+  /**
+   * Test getting the subscribers list.
+   */
+  function testGetSubscribers() {
+    $message = message_create('foo');
+
+    $node = $this->node;
+    $user1 = $this->user1;
+    $user2 = $this->user2;
+
+    $uids = message_subscribe_get_subscribers('node', $node, $message);
+
+    // Assert subscribers data.
+    $expected_uids = array(
+      $user1->uid => array(
+        'notifiers' => array(
+          'email' => 'email',
+        ),
+        'flags' => array(
+          'subscribe_node',
+        ),
+      ),
+      $user2->uid => array(
+        'notifiers' => array(),
+        'flags' => array(
+          'subscribe_node',
+        ),
+      ),
+    );
+
+    $this->assertEqual($uids, $expected_uids, 'All expected subscribers were fetched.');
+
+    $subscribe_options = array(
+      'uids' => $uids,
+    );
+    message_subscribe_send_message('node', $node, $message, array(), $subscribe_options);
+
+    // Assert sent emails.
+    $email_count = count(variable_get('drupal_test_email_collector', array()));
+    $this->assertEqual($email_count, 1, 'Only one user was sent an email.');
+  }
+}

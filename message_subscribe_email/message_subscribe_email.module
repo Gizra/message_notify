@@ -13,7 +13,7 @@ function message_subscribe_email_flag_access($flag, $content_id, $action, $accou
     $entity_type = FLAG_API_VERSION == 3 ? $flag->entity_type : $flag->content_type;
 
     // Get the other flags on that same content.
-    $user_flags = flag_get_user_flags($entity_type, $content_id);
+    $user_flags = flag_get_user_flags($entity_type, $content_id, $account->uid);
 
     $name = str_replace('email_', '', $flag->name);
     $prefix = variable_get('message_subscribe_flag_prefix', 'subscribe') . '_';
@@ -97,13 +97,13 @@ function message_subscribe_email_message_subscribe_get_subscribers_alter(&$uids,
   }
 
   if (FLAG_API_VERSION == 2) {
-    $result = db_select('flag_content', 'f');
+    $query = db_select('flag_content', 'f');
   }
   else {
-    $result = db_select('flagging', 'f');
+    $query = db_select('flagging', 'f');
   }
 
-  $result->fields('f', array('uid'))
+  $result = $query->fields('f', array('uid'))
     ->condition('fid', $flag_ids, 'IN')
     ->condition('uid', array_keys($uids), 'IN')
     ->groupBy('uid')
