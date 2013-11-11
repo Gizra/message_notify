@@ -35,6 +35,9 @@
  *     worker. see message_subscribe_queue_worker().
  *   - "entity access": Determine if access to view the entity should be applied
  *     when getting the list of subscribed users. Defaults to TRUE.
+ *   - "notify_own_actions": Determines if the user that created the entity
+ *      gets notified of their own action. If TRUE the author will get notified.
+ *      Defaults to FALSE.
  * @param $context
  *   Optional; Array keyed with the entity type and array of entity IDs as
  *   the value. For example, if the event is related to a node
@@ -56,6 +59,7 @@
  */
 function message_subscribe_send_message($entity_type, $entity, Message $message, $notify_options = array(), $subscribe_options = array(), $context = array()) {
   $use_queue = isset($subscribe_options['use queue']) ? $subscribe_options['use queue'] : variable_get('message_subscribe_use_queue', FALSE);
+  $notify_own_actions = isset($subscribe_options['notify_own_actions']) ? $subscribe_options['notify_own_actions'] : variable_get('message_subscribe_notify_own_actions', FALSE);
 
   // Save message by default.
   $subscribe_options += array(
@@ -68,6 +72,7 @@ function message_subscribe_send_message($entity_type, $entity, Message $message,
     'use queue' => $use_queue,
     'queue' => FALSE,
     'entity access' => TRUE,
+    'notify_own_actions' => $notify_own_actions,
   );
 
   if (empty($message->mid) && $subscribe_options['save message']) {
@@ -120,7 +125,6 @@ function message_subscribe_send_message($entity_type, $entity, Message $message,
     // If we use a queue, it will be deleted.
     return $message;
   }
-
 
   foreach ($uids as $uid => $values) {
     $last_uid = $uid;
@@ -200,6 +204,7 @@ function message_subscribe_send_message($entity_type, $entity, Message $message,
  */
 function message_subscribe_get_subscribers($entity_type, $entity, Message $message, $subscribe_options = array(), &$context = array()) {
   $context = $context ? $context : message_subscribe_get_basic_context($entity_type, $entity, $subscribe_options, $context);
+  $notify_own_actions = isset($subscribe_options['notify_own_actions']) ? $subscribe_options['notify_own_actions'] : variable_get('message_subscribe_notify_own_actions', FALSE);
 
   $uids = array();
   // We don't use module_invoke_all() is we want to retain the array keys,
@@ -208,6 +213,11 @@ function message_subscribe_get_subscribers($entity_type, $entity, Message $messa
     $function = $module . '_message_subscribe_get_subscribers';
     $result = $function($message, $subscribe_options, $context);
     foreach ($result as $uid => $values) {
+      // See if the author of the entity gets notified.
+      if ($notify_own_actions && $entity->uid == $uid) {
+        continue;
+      }
+
       if (!empty($subscribe_options['entity access'])) {
         $account = user_load($uid);
         if (!entity_access('view', $entity_type, $entity, $account)) {
@@ -215,6 +225,7 @@ function message_subscribe_get_subscribers($entity_type, $entity, Message $messa
           continue;
         }
       }
+
       $uids[$uid] = $values;
     }
   }

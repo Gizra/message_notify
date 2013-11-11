@@ -282,6 +282,56 @@ class MessageSubscribeSubscribersTest extends DrupalWebTestCase {
   }
 
   /**
+   * Testing the exclusion of the entity author from the subscribers lists.
+   */
+  function testGetSubscribersExcludeSelf() {
+    // Test the affect of the variable when set to TRUE.
+    variable_set('message_subscribe_notify_own_actions', TRUE);
+    $message = message_create('foo', array());
+
+    $node = $this->node;
+    $user1 = $this->user1;
+    $user2 = $this->user2;
+
+    $uids = message_subscribe_get_subscribers('node', $node, $message);
+
+    // Assert subscribers data.
+    $expected_uids = array(
+      $user2->uid => array(
+        'notifiers' => array(),
+        'flags' => array(
+          'subscribe_node',
+          'subscribe_user',
+        ),
+      ),
+    );
+    $this->assertEqual($uids, $expected_uids, 'All subscribers except for the triggering user were fetched.');
+
+    // Test the affect of the variable when set to FALSE.
+    variable_set('message_subscribe_notify_own_actions', FALSE);
+
+    $uids = message_subscribe_get_subscribers('node', $node, $message);
+
+    // Assert subscribers data.
+    $expected_uids = array(
+      $user1->uid => array(
+        'notifiers' => array(),
+        'flags' => array(
+          'subscribe_node',
+        ),
+      ),
+      $user2->uid => array(
+        'notifiers' => array(),
+        'flags' => array(
+          'subscribe_node',
+          'subscribe_user',
+        ),
+      ),
+    );
+    $this->assertEqual($uids, $expected_uids, 'All subscribers including the triggering user were fetched.');
+  }
+
+  /**
    * Assert subscribers list is entity-access aware.
    */
   function testEntityAccess() {

@@ -19,6 +19,13 @@ function message_subscribe_admin_settings() {
     '#required' => FALSE,
   );
 
+  $form['message_subscribe_notify_own_actions'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Notify author of their own submissions'),
+    '#description' => t('Determines if the user that caused the message notification receive a message about their actions. e.g. If I add a comment to a node, should I get an email saying I added a comment to a node?'),
+    '#default_value' => variable_get('message_subscribe_notify_own_actions', FALSE),
+  );
+
   $prefix = variable_get('message_subscribe_flag_prefix', 'subscribe') . '_';
 
   // For every subscription flag, show a view selection.
