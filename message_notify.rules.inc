@@ -48,7 +48,7 @@ function message_notify_rules_action_info() {
       ),
       'rendered_body_field' => array(
         'type' => 'token',
-        'label' => t('Body subject field'),
+        'label' => t('Rendered body field'),
         'description' => t('The field to save the rendered body.'),
         'default value' => FALSE,
         'optional' => TRUE,
