@@ -5,7 +5,6 @@ version = 7.x-1.0
 project = message_subscribe_email
 dependencies[] = flag
 dependencies[] = list
-dependencies[] = message_subscribe_ui
 dependencies[] = views
 
 files[] = message_subscribe_email.test
