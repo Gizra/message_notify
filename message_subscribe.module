@@ -26,7 +26,14 @@
  *   - "last uid": The last user ID to query.
  *   - "uids": Array of user IDs to be processed. Setting this, will cause
  *     skipping message_subscribe_get_subscribers() to get the subscribed
- *     users.
+ *     users. For example:
+ *     $subscribe_options['uids'] = array(
+ *       'uids' => array(
+ *         1 => array(
+ *          'notifiers' => array('email'),
+ *         ),
+ *       ),
+ *     );
  *   - "range": The number of items to fetch in the query.
  *   - "end time": The timestamp of the time limit for the function to
  *     execute. Defaults to FALSE, meaning there is no time limitation.
@@ -54,7 +61,7 @@
  *   );
  * @endcode
  *
- * @return
+ * @return Message
  *   The message object.
  */
 function message_subscribe_send_message($entity_type, $entity, Message $message, $notify_options = array(), $subscribe_options = array(), $context = array()) {
