@@ -28,10 +28,8 @@
  *     skipping message_subscribe_get_subscribers() to get the subscribed
  *     users. For example:
  *     $subscribe_options['uids'] = array(
- *       'uids' => array(
- *         1 => array(
- *          'notifiers' => array('email'),
- *         ),
+ *       1 => array(
+ *        'notifiers' => array('email'),
  *       ),
  *     );
  *   - "range": The number of items to fetch in the query.
