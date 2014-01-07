@@ -219,7 +219,7 @@ function message_subscribe_get_subscribers($entity_type, $entity, Message $messa
     $result = $function($message, $subscribe_options, $context);
     foreach ($result as $uid => $values) {
       // See if the author of the entity gets notified.
-      if ($notify_own_actions && $entity->uid == $uid) {
+      if (!$notify_own_actions && $entity->uid == $uid) {
         continue;
       }
 

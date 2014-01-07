@@ -238,12 +238,6 @@ class MessageSubscribeSubscribersTest extends DrupalWebTestCase {
 
     // Assert subscribers data.
     $expected_uids = array(
-      $user1->uid => array(
-        'notifiers' => array(),
-        'flags' => array(
-          'subscribe_node',
-        ),
-      ),
       $user2->uid => array(
         'notifiers' => array(),
         'flags' => array(
@@ -285,8 +279,8 @@ class MessageSubscribeSubscribersTest extends DrupalWebTestCase {
    * Testing the exclusion of the entity author from the subscribers lists.
    */
   function testGetSubscribersExcludeSelf() {
-    // Test the affect of the variable when set to TRUE.
-    variable_set('message_subscribe_notify_own_actions', TRUE);
+    // Test the affect of the variable when set to FALSE (do not notify self).
+    variable_set('message_subscribe_notify_own_actions', FALSE);
     $message = message_create('foo', array());
 
     $node = $this->node;
@@ -307,8 +301,8 @@ class MessageSubscribeSubscribersTest extends DrupalWebTestCase {
     );
     $this->assertEqual($uids, $expected_uids, 'All subscribers except for the triggering user were fetched.');
 
-    // Test the affect of the variable when set to FALSE.
-    variable_set('message_subscribe_notify_own_actions', FALSE);
+    // Test the affect of the variable when set to TRUE (Notify self).
+    variable_set('message_subscribe_notify_own_actions', TRUE);
 
     $uids = message_subscribe_get_subscribers('node', $node, $message);
 
@@ -335,6 +329,9 @@ class MessageSubscribeSubscribersTest extends DrupalWebTestCase {
    * Assert subscribers list is entity-access aware.
    */
   function testEntityAccess() {
+    // Make sure we are notifying ourselves for this test.
+    variable_set('message_subscribe_notify_own_actions', TRUE);
+
     $message = message_create('foo', array());
 
     $node = $this->node;
