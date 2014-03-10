@@ -700,7 +700,10 @@ function message_subscribe_queue_worker($data, $end_time = FALSE) {
   extract($data);
 
   $entity = entity_load_single($entity_type, $entity_id);
-  $message = message_load($mid);
+  if (!$message = message_load($mid)) {
+    // Abort if the message has been deleted to avoid errors.
+    return;
+  }
   $subscribe_options['queue'] = TRUE;
 
   message_subscribe_send_message($entity_type, $entity, $message, $notify_options, $subscribe_options, $context);
