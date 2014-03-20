@@ -15,12 +15,12 @@ class MessageSubscribeContextTest extends DrupalWebTestCase {
       'name' => 'Get context',
       'description' => 'Get context from an entity.',
       'group' => 'Message subscribe',
-      'dependencies' => array('og')
+      'dependencies' => array('og'),
     );
   }
 
   function setUp() {
-    parent::setUp('message_subscribe', 'og', 'taxonomy');
+    parent::setUp('message_subscribe', 'taxonomy', 'og');
 
     $user1 = $this->drupalCreateUser();
     $user2 = $this->drupalCreateUser();
@@ -228,10 +228,9 @@ class MessageSubscribeSubscribersTest extends DrupalWebTestCase {
    * Test getting the subscribers list.
    */
   function testGetSubscribers() {
-    $message = message_create('foo', array());
+    $message = message_create('foo', array('uid' => $this->user1->uid));
 
     $node = $this->node;
-    $user1 = $this->user1;
     $user2 = $this->user2;
 
     $uids = message_subscribe_get_subscribers('node', $node, $message);
@@ -281,7 +280,7 @@ class MessageSubscribeSubscribersTest extends DrupalWebTestCase {
   function testGetSubscribersExcludeSelf() {
     // Test the affect of the variable when set to FALSE (do not notify self).
     variable_set('message_subscribe_notify_own_actions', FALSE);
-    $message = message_create('foo', array());
+    $message = message_create('foo', array('uid' => $this->user1->uid));
 
     $node = $this->node;
     $user1 = $this->user1;
