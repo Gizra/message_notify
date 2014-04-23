@@ -225,24 +225,28 @@ function message_subscribe_get_subscribers($entity_type, $entity, Message $messa
   foreach (module_implements('message_subscribe_get_subscribers') as $module) {
     $function = $module . '_message_subscribe_get_subscribers';
     $result = $function($message, $subscribe_options, $context);
-      $uids += $result;
-    }
+    $uids += $result;
+  }
 
-    // If we're not notifying blocked users, exclude those users from the result
-    // set now so that we avoid unnecessarily loading those users later.
-    if (empty($subscribe_options['notify blocked users'])) {
-        $query = new EntityFieldQuery();
-          $query->entityCondition('entity_type', 'user')
-          ->propertyCondition('status', 1)
-          ->propertyCondition('uid', array_keys($uids), 'IN');
-      $active_uids = $query->execute();
-      $uids = array_intersect_key($uids, $active_uids['user']);
-    }
+  // If we're not notifying blocked users, exclude those users from the result
+  // set now so that we avoid unnecessarily loading those users later.
+  if (empty($subscribe_options['notify blocked users'])) {
+    $query = new EntityFieldQuery();
+    $results = $query
+      ->entityCondition('entity_type', 'user')
+      ->propertyCondition('status', 1)
+      ->propertyCondition('uid', array_keys($uids), 'IN')
+      ->execute();
 
-    foreach ($uids as $uid => $values) {
-        // See if the author of the entity gets notified.
-        if (!$notify_message_owner && $entity->uid == $uid) {
-            unset($uids[$uid]);
+    if (!empty($results['user'])) {
+      $uids = array_intersect_key($uids, $results['user']);
+    }
+  }
+
+  foreach ($uids as $uid => $values) {
+    // See if the author of the entity gets notified.
+    if (!$notify_message_owner && $entity->uid == $uid) {
+      unset($uids[$uid]);
     }
 
     if (!empty($subscribe_options['entity access'])) {
@@ -268,7 +272,6 @@ function message_subscribe_get_subscribers($entity_type, $entity, Message $messa
 
   return $uids;
 }
-
 
 /**
  * Get context from entity type.
@@ -425,7 +428,7 @@ function message_subscribe_message_subscribe_get_subscribers(Message $message, $
 
     if ($range) {
       $query->range(0, $range);
-      // If we're notifiying blocked users, we need to take this into account
+      // If we're mpt notifying blocked users, we need to take this into account
       // in this query so that the range is accurate.
       if (empty($subscribe_options['notify blocked users'])) {
         $query->join('users', 'users', 'users.uid = fc.uid');
