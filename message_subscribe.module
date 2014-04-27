@@ -230,7 +230,7 @@ function message_subscribe_get_subscribers($entity_type, $entity, Message $messa
 
   // If we're not notifying blocked users, exclude those users from the result
   // set now so that we avoid unnecessarily loading those users later.
-  if (empty($subscribe_options['notify blocked users'])) {
+  if (empty($subscribe_options['notify blocked users']) && !empty($uids)) {
     $query = new EntityFieldQuery();
     $results = $query
       ->entityCondition('entity_type', 'user')
