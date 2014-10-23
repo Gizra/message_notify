@@ -8,6 +8,5 @@ dependencies[] = ctools
 dependencies[] = flag
 dependencies[] = message
 dependencies[] = message_notify
-test_dependencies[] = og
 
 files[] = message_subscribe.test

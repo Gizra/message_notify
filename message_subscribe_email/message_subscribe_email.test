@@ -38,7 +38,10 @@ class MessageSubscribeEmailTestHelper extends DrupalWebTestCase {
     $this->checkPermissions(array(), TRUE);
 
     $permissions = array(
-      'administer flags',
+      'flag subscribe_node',
+      'unflag subscribe_node',
+      'flag email_node',
+      'unflag email_node',
     );
 
     $user1 = $this->drupalCreateUser($permissions);

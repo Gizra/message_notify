@@ -188,10 +188,16 @@ class MessageSubscribeSubscribersTest extends DrupalWebTestCase {
     $this->checkPermissions(array(), TRUE);
 
     $user1 = $this->drupalCreateUser(array(
-      'administer flags',
+      'flag subscribe_node',
+      'unflag subscribe_node',
+      'flag subscribe_user',
+      'unflag subscribe_user'
     ));
     $user2 = $this->drupalCreateUser(array(
-      'administer flags',
+      'flag subscribe_node',
+      'unflag subscribe_node',
+      'flag subscribe_user',
+      'unflag subscribe_user'
     ));
 
     // Create node.
@@ -243,10 +249,16 @@ class MessageSubscribeSubscribersTest extends DrupalWebTestCase {
     $this->assertEqual($uids, $expected_uids, 'All expected subscribers were fetched.');
 
     $user3 = $this->drupalCreateUser(array(
-      'administer flags',
+      'flag subscribe_node',
+      'unflag subscribe_node',
+      'flag subscribe_user',
+      'unflag subscribe_user'
     ));
     $user4 = $this->drupalCreateUser(array(
-      'administer flags',
+      'flag subscribe_node',
+      'unflag subscribe_node',
+      'flag subscribe_user',
+      'unflag subscribe_user'
     ));
     flag('flag', 'subscribe_node', $node->nid, $user3);
     flag('flag', 'subscribe_node', $node->nid, $user4);
