@@ -109,7 +109,7 @@ function message_subscribe_ui_tab_title($account, $flag_name = NULL) {
   // Get the message subscribe count from the page view.
   if ($view = message_subscribe_ui_get_view($account, $flag_name)) {
     $view->get_total_rows = TRUE;
-    $view->preview();
+    $view->execute();
     $count = $view->total_rows;
   }
 
