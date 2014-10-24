@@ -12,7 +12,7 @@
 
 class MessageSubscribeEmailTestHelper extends DrupalWebTestCase {
   function setUp() {
-    parent::setUp('message_subscribe_email', 'message_subscribe', 'flag');
+    parent::setUp('message_subscribe', 'flag', 'message_subscribe_email');
 
     // Create node-type.
     $node_type = $this->drupalCreateContentType();
@@ -72,7 +72,7 @@ class MessageSubscribeEmailSubscribersTest extends MessageSubscribeEmailTestHelp
     return array(
       'name' => 'Get email subscribers',
       'description' => 'Get email subscribers from content.',
-      'group' => 'Message subscribe email',
+      'group' => 'Message subscribe',
     );
   }
 
@@ -149,7 +149,7 @@ class MessageSubscribeEmailNotificationsTest extends MessageSubscribeEmailTestHe
     return array(
       'name' => 'Check email notifications',
       'description' => 'Check automatic email notifications for content.',
-      'group' => 'Message subscribe email',
+      'group' => 'Message subscribe',
     );
   }
 
