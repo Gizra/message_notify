@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Gizra/message_notify.svg?branch=7.x-2.x)](https://travis-ci.org/Gizra/message_notify)
+
 Message notify allows sending Messages (entities created with the Message
 module).
 Delivery can be done by email, or any other delivery method provided by
