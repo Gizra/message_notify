@@ -61,6 +61,20 @@ function message_notify_plugin_process(&$plugin, $info) {
     'save on success' => TRUE,
     'language override' => FALSE,
     'rendered fields' => array(),
+    'logger plugin' => 'watchdog',
+  );
+}
+
+/**
+ * Add defaults values to the notifier logger plugins.
+ *
+ * - 'description': The description of the plugin.
+ * - 'options': An array of options.
+ */
+function message_notify_logger_plugin_process(&$plugin, $info) {
+  $plugin += array(
+    'description' => '',
+    'options' => array(),
   );
 }
 
@@ -127,6 +141,9 @@ function message_notify_ctools_plugin_api($module, $api) {
   if ($module == 'message_notify' && $api == 'notifier') {
     return array('version' => 1);
   }
+  if ($module == 'message_notify' && $api == 'notifier_logger') {
+    return array('version' => 1);
+  }
 }
 
 /**
@@ -136,6 +153,10 @@ function message_notify_ctools_plugin_type() {
   $plugins['notifier'] = array(
     'classes' => array('class'),
     'process' => 'message_notify_plugin_process',
+  );
+  $plugins['notifier_logger'] = array(
+    'classes' => array('class'),
+    'process' => 'message_notify_logger_plugin_process',
   );
   return $plugins;
 }
