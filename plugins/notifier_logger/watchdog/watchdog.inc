@@ -6,6 +6,6 @@ $plugin = array(
   'class' => 'MessageNotifierLoggerWatchdog',
   'options' => array(
     'log on fail' => TRUE,
-    'log on success' => TRUE,
+    'log on success' => FALSE,
   ),
 );
