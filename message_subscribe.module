@@ -136,6 +136,8 @@ function message_subscribe_send_message($entity_type, $entity, Message $message,
     // Clone the message in case it will need to be saved, it won't
     // overwrite the existing one.
     $cloned_message = clone $message;
+    // Push a copy of the original message into the new one.
+    $cloned_message->original = $message;
     unset($cloned_message->mid);
     $cloned_message->uid = $uid;
 
