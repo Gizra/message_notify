@@ -28,8 +28,7 @@ before_script:
   # reference and enable module in build site
   - ln -s $(readlink -e $(cd -)) message_subscribe/drupal/sites/all/modules/message_subscribe
   - cd message_subscribe/drupal
-  - drush --yes pm-enable message_subscribe message_subscribe_email
-  - drush dl og -y
+  - drush --yes pm-enable message_subscribe message_subscribe_email og
 
   # start a web server on port 8080, run in the background; wait for initialization
   - drush runserver 127.0.0.1:8080 &
