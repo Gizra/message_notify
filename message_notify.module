@@ -21,7 +21,7 @@
  */
 function message_notify_send_message(Message $message, array $options = array(), $notifier_name = 'email') {
   if (!$plugin = message_notify_get_notifier($notifier_name)) {
-   throw new MessageNotifyException(format_string('Could not send notification using the "@notifier" notifier.'), array('@notifier' => $notifier_name));
+    throw new MessageNotifyException(format_string('Could not send notification using the "@notifier" notifier.', array('@notifier' => $notifier_name)));
   }
 
   $plugin['options'] = drupal_array_merge_deep($plugin['options'], $options);
