@@ -19,6 +19,15 @@ interface MessageNotifierInterface {
    */
   public function __construct($plugin, Message $message);
 
+
+  /**
+   * Return the plugin definition array that is passed in on construction.
+   *
+   * @return array
+   *   The ctools plugin definiton array.
+   */
+  public function getPluginDefinition();
+
   /**
    * Entry point to send and process a message.
    *
@@ -48,6 +57,11 @@ interface MessageNotifierInterface {
    * Determine if user can access notifier.
    */
   public function access();
+
+  /**
+   * Return an instance of a class for logging send results.
+   */
+  public function getLogger();
 }
 
 /**
@@ -64,6 +78,15 @@ abstract class MessageNotifierBase implements MessageNotifierInterface {
    * The message entity.
    */
   protected $message;
+
+  /**
+   * The logger class for this Notfier.
+   */
+  protected $logger;
+
+  public function getPluginDefinition() {
+    return $this->plugin;
+  }
 
   public function __construct($plugin, Message $message) {
     $this->plugin = $plugin;
@@ -96,12 +119,11 @@ abstract class MessageNotifierBase implements MessageNotifierInterface {
 
     $options = $plugin['options'];
 
+    // Log the result of sending.
+    $this->getLogger()->log($result, $message);
     $save = FALSE;
-    if (!$result) {
-      watchdog('message_notify', t('Could not send message using @title to user ID @uid.'), array('@label' => $plugin['title'], '@uid' => $message->uid), WATCHDOG_ERROR);
-      if ($options['save on fail']) {
-        $save = TRUE;
-      }
+    if (!$result && $options['save on fail']) {
+      $save = TRUE;
     }
     elseif ($result && $options['save on success']) {
       $save = TRUE;
@@ -139,5 +161,19 @@ abstract class MessageNotifierBase implements MessageNotifierInterface {
 
   public function access() {
     return TRUE;
+  }
+
+  public function getLogger() {
+    if (!isset($this->logger)) {
+      $options = $this->plugin['options'];
+      $logger_plugin = $options['logger plugin'];
+
+      ctools_include('plugins');
+      $plugin = ctools_get_plugins('message_notify', 'notifier_logger', $options['logger plugin']);
+
+      $class = ctools_plugin_load_class('message_notify', 'notifier_logger', $logger_plugin, 'class');
+      $this->logger = new $class($plugin, $this);
+    }
+    return $this->logger;
   }
 }

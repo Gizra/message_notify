@@ -8,6 +8,7 @@ dependencies[] = ctools
 ; Notifier plugins
 files[] = includes/message_notify.exception.inc
 files[] = plugins/notifier/abstract.inc
+files[] = plugins/notifier_logger/abstract.inc
 
 ; Tests
 files[] = message_notify.test
