@@ -702,6 +702,10 @@ function message_subscribe_queue_worker($data, $end_time = FALSE) {
   extract($data);
 
   $entity = entity_load_single($entity_type, $entity_id);
+  if (!$entity) {
+    // Abort if the entity could not be loaded to avoid errors.
+    return;
+  }
   if (!$message = message_load($mid)) {
     // Abort if the message has been deleted to avoid errors.
     return;
