@@ -111,36 +111,59 @@ function message_subscribe_email_message_subscribe_get_subscribers_alter(&$uids,
     // Nobody is subscribed to the content.
     return;
   }
-
-  if (!$flags = message_subscribe_email_flag_get_flags()) {
-    // No subscribe email related flags.
-    return;
+  // Remove notifiers so we can add them back
+  // only to the intended uids.
+  foreach($uids as $uid => $options) {
+    $uids[$uid]['notifiers'] = array();
   }
 
-  $flag_ids = array();
-  foreach ($flags as $flag) {
-    $flag_ids[] = $flag->fid;
-  }
+  $context = $values['context'];
+  // Find the users that subscribed to each context.
+  foreach ($context as $entity_type => $entity_ids) {
 
-  if (FLAG_API_VERSION == 2) {
-    $query = db_select('flag_content', 'f');
-  }
-  else {
-    $query = db_select('flagging', 'f');
-  }
+    if (!$entity_ids) {
+      continue;
+    }
 
-  $result = $query->fields('f', array('uid'))
-    ->condition('fid', $flag_ids, 'IN')
-    ->condition('uid', array_keys($uids), 'IN')
-    ->groupBy('uid')
-    ->execute()
-    ->fetchAll();
+    // Get all flags on given entity type.
+    if (!$flags = message_subscribe_email_flag_get_flags($entity_type)) {
+      continue;
+    }
 
-  foreach ($result as $row) {
-    // Add 'email' to the list of notifiers.
-    $uids[$row->uid]['notifiers']['email'] = 'email';
+    $fids = array();
+    foreach ($flags as $flag) {
+      $fids[$flag->fid] = $flag->name;
+    }
+
+    // Query all the entity IDs inside the given flags. We don't use
+    // flag_get_content_flags() as we want to get all the flaggings of an
+    // entity-type in a single query.
+    if (FLAG_API_VERSION == 2) {
+      $query = db_select('flag_content', 'fc')
+        ->condition('content_type', $entity_type)
+        ->condition('content_id', $entity_ids, 'IN');
+    }
+    else {
+      $query = db_select('flagging', 'fc')
+        ->condition('entity_type', $entity_type)
+        ->condition('entity_id', $entity_ids, 'IN');
+    }
+
+    $result = $query->fields('fc')
+      ->condition('fid', array_keys($fids), 'IN')
+      ->condition('uid', array_keys($uids), 'IN')
+      ->groupBy('uid')
+      ->execute()
+      ->fetchAll();
+
+    foreach ($result as $row) {
+
+      // Add 'email' to the list of notifiers.
+      $uids[$row->uid]['notifiers']['email'] = 'email';
+    }
   }
 }
+
 
 /**
  * Implements hook_views_api().
