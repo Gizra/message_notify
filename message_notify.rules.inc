@@ -62,6 +62,14 @@ function message_notify_rules_action_info() {
         'allow null' => TRUE,
         'optional' => TRUE,
       ),
+      'from' => array(
+        'type' => 'text',
+        'label' => t('The sender of the email'),
+        'description' => t('The sender of the email. If left empty, the mail will be sent from the site-wide configured address.'),
+        'default value' => FALSE,
+        'allow null' => TRUE,
+        'optional' => TRUE,
+      ),
     ),
     'base' => 'message_notify_rules_process',
   );
@@ -72,7 +80,7 @@ function message_notify_rules_action_info() {
 /**
  * Action: Process and send Message.
  */
-function message_notify_rules_process(Message $message, $save_on_fail, $save_on_success, $rendered_subject_field, $rendered_body_field, $mail = FALSE) {
+function message_notify_rules_process(Message $message, $save_on_fail, $save_on_success, $rendered_subject_field, $rendered_body_field, $mail = FALSE, $from = FALSE) {
   $options = array(
     'save on fail' => $save_on_fail,
     'save on success' => $save_on_success,
@@ -86,7 +94,11 @@ function message_notify_rules_process(Message $message, $save_on_fail, $save_on_
   }
 
   if ($mail) {
-    $options['mail'] =  str_replace(array("\r", "\n"), '', $mail);
+    $options['mail'] = str_replace(array("\r", "\n"), '', $mail);
+  }
+
+  if ($from) {
+    $options['from'] = $from;
   }
 
   message_notify_send_message($message, $options, 'email');

@@ -7,6 +7,8 @@ $plugin = array(
   'options' => array(
     // Override mail. Don't use the email that is assigned to the user.
     'mail' => FALSE,
+    // Override from. Don't use the site-wide configured address.
+    'from' => FALSE,
   ),
    // A notifier must define its own view modes.
    // Those view modes are later going to be rendered and sent.
