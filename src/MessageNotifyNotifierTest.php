@@ -1,4 +1,5 @@
 <?php
+namespace Drupal\message_notify;
 
 /**
  * Test the Message notifier plugins handling.
@@ -226,4 +227,3 @@ class MessageNotifyNotifierTest extends DrupalWebTestCase {
     }
   }
 }
-

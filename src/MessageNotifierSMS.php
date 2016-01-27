@@ -1,4 +1,5 @@
 <?php
+namespace Drupal\message_notify;
 
 /**
  * @file

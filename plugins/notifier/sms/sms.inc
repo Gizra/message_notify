@@ -1,6 +1,6 @@
 <?php
 
-if (module_exists('sms')) {
+if (\Drupal::moduleHandler()->moduleExists('sms')) {
   $plugin = array(
     'title' => t('SMS'),
     'description' => t('Send SMS using the SMS framework module.'),

@@ -24,7 +24,7 @@ function message_notify_send_message(Message $message, array $options = array(),
     throw new MessageNotifyException(format_string('Could not send notification using the "@notifier" notifier.', array('@notifier' => $notifier_name)));
   }
 
-  $plugin['options'] = drupal_array_merge_deep($plugin['options'], $options);
+  $plugin['options'] = \Drupal\Component\Utility\NestedArray::mergeDeep($plugin['options'], $options);
 
   $class = ctools_plugin_load_class('message_notify', 'notifier', $notifier_name, 'class');
   $notifier = new $class($plugin, $message);
@@ -96,7 +96,7 @@ function message_notify_mail($key, &$message, $params) {
  * We cannot easily set the the visibilty of extra fields, so we set the
  * bundle settings upon creation of new message bundle.
  */
-function message_notify_field_attach_create_bundle($entity_type, $bundle) {
+function message_notify_entity_bundle_create($entity_type, $bundle) {
   if ($entity_type != 'message') {
     return;
   }
@@ -156,16 +156,26 @@ function message_notify_ctools_plugin_directory($module, $plugin) {
  *   The plugin that should be laoded.
  */
 function message_notify_get_notifier($notifier_name) {
-  ctools_include('plugins');
-  return ctools_get_plugins('message_notify', 'notifier', $notifier_name);
+  // @FIXME
+// Most CTools APIs have been moved into core.
+// 
+// @see https://www.drupal.org/node/2164623
+// ctools_include('plugins');
+
+  return \Drupal::service('plugin.manager.message_notify.notifier')->getDefinitions();
 }
 
 /**
  * Helper function to include CTools plugins and get all notifier plugins.
  */
 function message_notify_get_notifiers() {
-  ctools_include('plugins');
-  return ctools_get_plugins('message_notify', 'notifier');
+  // @FIXME
+// Most CTools APIs have been moved into core.
+// 
+// @see https://www.drupal.org/node/2164623
+// ctools_include('plugins');
+
+  return \Drupal::service('plugin.manager.message_notify.notifier')->getDefinitions();
 }
 
 /**
@@ -175,7 +185,7 @@ function message_notify_get_notifiers_as_options() {
   $notifiers = message_notify_get_notifiers();
   $options = array();
   foreach ($notifiers as $notifier_name => $notifier) {
-    $options[$notifier_name] = check_plain($notifier['title']);
+    $options[$notifier_name] = \Drupal\Component\Utility\Html::escape($notifier['title']);
   }
 
   return $options;

@@ -1,0 +1,7 @@
+name: 'Message notify'
+description: 'Message notify.'
+core: 8.x
+package: Message
+dependencies:
+  - message
+type: module

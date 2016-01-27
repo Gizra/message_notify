@@ -10,8 +10,22 @@
  */
 function message_notify_uninstall() {
   $instance = field_info_instance('message_type', 'message_text_subject', 'message_type_email');
-  field_delete_instance($instance);
-  field_delete_field('message_text_subject');
+  // @FIXME
+// Fields and field instances are now exportable configuration entities, and
+// the Field Info API has been removed.
+// 
+// 
+// @see https://www.drupal.org/node/2012896
+// field_delete_instance($instance);
+
+  // @FIXME
+// Fields and field instances are now exportable configuration entities, and
+// the Field Info API has been removed.
+// 
+// 
+// @see https://www.drupal.org/node/2012896
+// field_delete_field('message_text_subject');
+
 }
 
 /**
@@ -20,7 +34,7 @@ function message_notify_uninstall() {
 function message_notify_update_7000() {
   $field = field_info_field('message_text_subject');
   $field['settings']['message_text'] = TRUE;
-  field_update_field($field);
+  $field->save();
 }
 
 /**
@@ -36,7 +50,7 @@ function message_notify_update_7001() {
 function message_notify_update_7002() {
   $field = field_info_field('message_text_subject');
   $field['settings']['message_text'] = TRUE;
-  field_update_field($field);
+  $field->save();
 }
 
 /**
@@ -79,8 +93,8 @@ function message_notify_update_7003(&$sandbox) {
     // first delta.
     $row->message_text_value = $row->message_text_subject_value;
     $row->message_text_format = $row->message_text_subject_format;
-    drupal_write_record($table_name, $row);
-    drupal_write_record($revision_name, $row);
+    \Drupal::database()->insert($table_name)->fields($row)->execute();
+    \Drupal::database()->insert($revision_name)->fields($row)->execute();
   }
 
   // Change the message-type bundle.
@@ -91,7 +105,14 @@ function message_notify_update_7003(&$sandbox) {
 
   // Delete the subject field.
   $instance = field_info_instance('message_type', 'message_text_subject', 'message_type_email');
-  field_delete_instance($instance);
+  // @FIXME
+// Fields and field instances are now exportable configuration entities, and
+// the Field Info API has been removed.
+// 
+// 
+// @see https://www.drupal.org/node/2012896
+// field_delete_instance($instance);
+
 
   return ('"Email" mesage-type category was deleted. All the values from the "Subject" field were migrated into "Message-text" field. You should adjust the Email related view-modes under "Manage display" tab of each message-type.');
 }
