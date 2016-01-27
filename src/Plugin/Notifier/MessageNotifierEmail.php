@@ -1,11 +1,24 @@
 <?php
-namespace Drupal\message_notify;
+/**
+ * @file
+ * Contains \Drupal\message_notify\Plugin\Notifier\MessageNotifierEmail.
+ */
+
+namespace Drupal\message_notify\Plugin\Notifier;
 
 /**
  * Email notifier.
+ *
+ * @Notifier(
+ *   id = "email",
+ *   title = @Translation("E-mail notifier")
+ * )
  */
 class MessageNotifierEmail extends MessageNotifierBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function deliver(array $output = array()) {
     $plugin = $this->plugin;
     $message = $this->message;

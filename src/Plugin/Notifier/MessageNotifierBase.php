@@ -1,10 +1,10 @@
 <?php
 /**
  * @file
- * Contains \Drupal\message_notify\MessageNotifierBase.
+ * Contains \Drupal\message_notify\Plugin\Notifier\MessageNotifierBase.
  */
 
-namespace Drupal\message_notify;
+namespace Drupal\message_notify\Plugin\Notifier;
 
 use Drupal\message\MessageInterface;
 
@@ -15,18 +15,22 @@ abstract class MessageNotifierBase implements MessageNotifierInterface {
 
   /**
    * The plugin definition.
+   *
+   * \Drupal\message_notify\Plugin\Notifier\MessageNotifierInterface
    */
   protected $plugin;
 
   /**
    * The message entity.
+   *
+   * @var \Drupal\message\MessageInterface
    */
   protected $message;
 
   /**
    * {@inheritdoc}
    */
-  public function __construct($plugin, MessageInterface $message) {
+  public function __construct(MessageNotifierInterface $plugin, MessageInterface $message) {
     $this->plugin = $plugin;
     $this->message = $message;
   }

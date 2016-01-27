@@ -1,10 +1,10 @@
 <?php
 /**
  * @file
- * Contains \Drupal\message_notify\MessageNotifierInterface.
+ * Contains \Drupal\message_notify\Plugin\Notifier\MessageNotifierInterface.
  */
 
-namespace Drupal\message_notify;
+namespace Drupal\message_notify\Plugin\Notifier;
 
 use Drupal\message\MessageInterface;
 
@@ -25,7 +25,7 @@ interface MessageNotifierInterface {
    * @param \Drupal\message\MessageInterface $message
    *   The Message entity.
    */
-  public function __construct($plugin, MessageInterface $message);
+  public function __construct(MessageNotifierInterface $plugin, MessageInterface $message);
 
   /**
    * Entry point to send and process a message.
