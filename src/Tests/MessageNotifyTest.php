@@ -6,6 +6,8 @@
 
 namespace Drupal\message_notify\Tests;
 
+use Drupal\message\Entity\Message;
+use Drupal\message\Entity\MessageType;
 use Drupal\simpletest\WebTestBase;
 
 /**
@@ -13,7 +15,7 @@ use Drupal\simpletest\WebTestBase;
  *
  * @group message_notify
  */
-class MessageNotifyNotifierTest extends WebTestBase {
+class MessageNotifyTest extends WebTestBase {
 
   /**
    * {@inheritdoc}
@@ -55,7 +57,8 @@ class MessageNotifyNotifierTest extends WebTestBase {
 // field_create_instance($instance);
 
 
-    $message_type = message_type_create('foo');
+    $message_type = MessageType::create(['type' => 'foo']);
+    $message_type->save();
     $wrapper = entity_metadata_wrapper('message_type', $message_type);
     $wrapper->{MESSAGE_FIELD_MESSAGE_TEXT}[] = array('value' => 'first partial', 'format' => 'plain_text');
     $wrapper->{MESSAGE_FIELD_MESSAGE_TEXT}[] = array('value' => 'second partial', 'format' => 'plain_text');
@@ -83,7 +86,7 @@ class MessageNotifyNotifierTest extends WebTestBase {
    *
    * Check the correct info is sent to delivery.
    */
-  function testDeliver() {
+  public function testDeliver() {
     $wrapper = entity_metadata_wrapper('message_type', $this->message_type);
     $message = message_create('foo');
     message_notify_send_message($message, array(), 'test');
@@ -97,8 +100,8 @@ class MessageNotifyNotifierTest extends WebTestBase {
   /**
    * Test Message save on delivery.
    */
-  function testPostSendMessageSave() {
-    $message = message_create('foo');
+  public function testPostSendMessageSave() {
+    $message = Message::create(['type' => 'foo']);
     $message->fail = FALSE;
     message_notify_send_message($message, array(), 'test');
     $this->assertTrue($message->mid, 'Message not saved after successful delivery.');

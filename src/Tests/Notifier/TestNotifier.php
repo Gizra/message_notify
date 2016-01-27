@@ -1,0 +1,25 @@
+<?php
+/**
+ * @file
+ * Contains \Drupal\message_notify\Tests\Notifier\TestNotifier.
+ */
+
+namespace Drupal\message_notify\Tests\Notifier;
+
+use Drupal\message_notify\MessageNotifierBase;
+
+/**
+ * Test notifier.
+ */
+class TestNotifier extends MessageNotifierBase {
+
+  /**
+   * {@inheritdoc}
+   */
+  public function deliver(array $output = array()) {
+    $this->message->output = $output;
+    // Return TRUE or FALSE as it was set on the Message.
+    return empty($this->fail);
+  }
+
+}

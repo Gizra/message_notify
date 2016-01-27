@@ -1,5 +1,12 @@
 <?php
+/**
+ * @file
+ * Contains \Drupal\message_notify\MessageNotifierBase.
+ */
+
 namespace Drupal\message_notify;
+
+use Drupal\message\MessageInterface;
 
 /**
  * An abstract implementation of MessageNotifierInterface.
@@ -16,7 +23,10 @@ abstract class MessageNotifierBase implements MessageNotifierInterface {
    */
   protected $message;
 
-  public function __construct($plugin, Message $message) {
+  /**
+   * {@inheritdoc}
+   */
+  public function __construct($plugin, MessageInterface $message) {
     $this->plugin = $plugin;
     $this->message = $message;
   }
