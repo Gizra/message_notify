@@ -1,19 +1,24 @@
 <?php
+/**
+ * @file
+ * Contains \Drupal\message_notify\Tests\MessageNotifyTest.
+ */
+
+namespace Drupal\message_notify\Tests;
+
+use Drupal\simpletest\WebTestBase;
 
 /**
  * Test the Message notifier plugins handling.
+ *
+ * @group message_notify
  */
-class MessageNotifyNotifierTest extends DrupalWebTestCase {
+class MessageNotifyNotifierTest extends WebTestBase {
 
-  public static function getInfo() {
-    return array(
-      'name' => 'Notifiers',
-      'description' => 'Test message notifier behavior.',
-      'group' => 'Message notify',
-    );
-  }
-
-  function setUp() {
+  /**
+   * {@inheritdoc}
+   */
+  public function setUp() {
     parent::setUp('message_notify_test');
 
     // Add another message-text field.

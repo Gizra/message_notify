@@ -5,6 +5,8 @@
  * Message notify.
  */
 
+use Drupal\message_notify\Exception\MessageNotifyException;
+
 /**
  * Process and send a message.
  *
