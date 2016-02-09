@@ -1,38 +1,45 @@
 <?php
-
 /**
  * @file
  * Message notify.
  */
 
+use Drupal\Component\Utility\NestedArray;
+use Drupal\message\MessageInterface;
 use Drupal\message_notify\Exception\MessageNotifyException;
 
 /**
  * Process and send a message.
  *
- * @param $message
+ * @param $message \Drupal\message\MessageInterface
  *   The message entity being used for the notification.
- * @param $options
+ * @param array $options
  *   Array of options to override the plugin's default ones.
- * @param $notifier_name
+ * @param string $notifier_name
  *   Optional; The name of the notifier to use. Defaults to "email"
  *   sending method.
  *
  * @return
  *   Boolean value denoting success or failure of the notification.
+ *
+ * @throws \Drupal\message_notify\Exception\MessageNotifyException
+ *   If no matching notifier plugin exists.
+ *
+ * @todo Move this to a manager/helper class.
  */
-function message_notify_send_message(Message $message, array $options = array(), $notifier_name = 'email') {
+function message_notify_send_message(MessageInterface $message, array $options = array(), $notifier_name = 'email') {
   if (!$plugin = message_notify_get_notifier($notifier_name)) {
     throw new MessageNotifyException(format_string('Could not send notification using the "@notifier" notifier.', array('@notifier' => $notifier_name)));
   }
 
-  $plugin['options'] = \Drupal\Component\Utility\NestedArray::mergeDeep($plugin['options'], $options);
+  $plugin['options'] = NestedArray::mergeDeep($plugin['options'], $options);
 
-  $class = ctools_plugin_load_class('message_notify', 'notifier', $notifier_name, 'class');
-  $notifier = new $class($plugin, $message);
-  if ($notifier->access()) {
-    return $notifier->send();
-  }
+  // @todo use core plugins
+  //  $class = ctools_plugin_load_class('message_notify', 'notifier', $notifier_name, 'class');
+  //  $notifier = new $class($plugin, $message);
+  //  if ($notifier->access()) {
+  //    return $notifier->send();
+  //  }
 }
 
 /**

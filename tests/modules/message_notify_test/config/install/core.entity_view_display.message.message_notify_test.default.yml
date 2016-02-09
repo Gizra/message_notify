@@ -1,0 +1,23 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.message.message_notify_test.message_text_another
+    - message.type.message_notify_test
+id: message.message_notify_test.default
+targetEntityType: message
+bundle: message_notify_test
+mode: default
+content:
+  message_text_another:
+    weight: 1
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    type: basic_string
+  partial_1:
+    weight: 0
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  partial_0: true

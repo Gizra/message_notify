@@ -18,67 +18,24 @@ use Drupal\simpletest\WebTestBase;
 class MessageNotifyTest extends WebTestBase {
 
   /**
+   * Testing message type.
+   *
+   * @var \Drupal\message\MessageTypeInterface
+   */
+  protected $messageType;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static $modules = ['message_notify_test'];
+
+  /**
    * {@inheritdoc}
    */
   public function setUp() {
-    parent::setUp('message_notify_test');
+    parent::setUp();
 
-    // Add another message-text field.
-    $field = array(
-      'field_name' => 'message_text_another',
-      'type' => 'text_long',
-      'entity_types' => array('message_type'),
-      'settings' => array(
-        // Mark that this field can be rendered using Message::getText().
-        'message_text' => TRUE,
-      ),
-    );
-    // @FIXME
-// Fields and field instances are now exportable configuration entities, and
-// the Field Info API has been removed.
-// 
-// 
-// @see https://www.drupal.org/node/2012896
-// $field = field_create_field($field);
-
-    $instance = array(
-      'field_name' => 'message_text_another',
-      'bundle' => 'message_type',
-      'entity_type' => 'message_type',
-      'label' => t('Message text'),
-      'required' => TRUE,
-    );
-    // @FIXME
-// Fields and field instances are now exportable configuration entities, and
-// the Field Info API has been removed.
-// 
-// 
-// @see https://www.drupal.org/node/2012896
-// field_create_instance($instance);
-
-
-    $message_type = MessageType::create(['type' => 'foo']);
-    $message_type->save();
-    $wrapper = entity_metadata_wrapper('message_type', $message_type);
-    $wrapper->{MESSAGE_FIELD_MESSAGE_TEXT}[] = array('value' => 'first partial', 'format' => 'plain_text');
-    $wrapper->{MESSAGE_FIELD_MESSAGE_TEXT}[] = array('value' => 'second partial', 'format' => 'plain_text');
-    $wrapper->message_text_another = 'another field';
-    $wrapper->save();
-
-    $this->message_type = $message_type;
-
-    // Enable the Full view mode, hide the first partial,
-    // and display the last partial first.
-    $settings = field_bundle_settings('message', 'foo');
-    $settings['view_modes']['full']['custom_settings'] = TRUE;
-    $settings['extra_fields']['display']['message__message_text__0']['foo'] = array('weight' => 0, 'visible' => FALSE);
-    $settings['extra_fields']['display']['message__message_text__1']['foo'] = array('weight' => 0, 'visible' => TRUE);
-    $settings['extra_fields']['display']['message__message_text_another__0']['foo'] = array('weight' => 0, 'visible' => FALSE);
-
-    $settings['extra_fields']['display']['message__message_text__0']['bar'] = array('weight' => 0, 'visible' => FALSE);
-    $settings['extra_fields']['display']['message__message_text__1']['bar'] = array('weight' => 0, 'visible' => FALSE);
-    $settings['extra_fields']['display']['message__message_text_another__0']['bar'] = array('weight' => 0, 'visible' => TRUE);
-    field_bundle_settings('message', 'foo', $settings);
+    $this->messageType = MessageType::load('message_notify_test');
   }
 
   /**
@@ -87,12 +44,11 @@ class MessageNotifyTest extends WebTestBase {
    * Check the correct info is sent to delivery.
    */
   public function testDeliver() {
-    $wrapper = entity_metadata_wrapper('message_type', $this->message_type);
-    $message = message_create('foo');
+    $message = Message::create(['type' => $this->messageType->id()]);
     message_notify_send_message($message, array(), 'test');
 
     // The test notifier added the output to the message.
-    $output = $message->output;
+    $output = $message->getText();
     $this->assertEqual($output['foo'], $wrapper->{MESSAGE_FIELD_MESSAGE_TEXT}->get(1)->value->value(), 'Correct values rendered in first view mode.');
     $this->assertEqual($output['bar'], $wrapper->message_text_another->value(), 'Correct values rendered in second view mode.');
   }
