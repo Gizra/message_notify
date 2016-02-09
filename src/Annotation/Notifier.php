@@ -10,6 +10,8 @@ use Drupal\Component\Annotation\Plugin;
 
 /**
  * Defines a notifier plugin.
+ *
+ * @Annotation
  */
 class Notifier extends Plugin {
 

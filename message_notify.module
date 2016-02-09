@@ -27,19 +27,23 @@ use Drupal\message_notify\Exception\MessageNotifyException;
  *
  * @todo Move this to a manager/helper class.
  */
-function message_notify_send_message(MessageInterface $message, array $options = array(), $notifier_name = 'email') {
-  if (!$plugin = message_notify_get_notifier($notifier_name)) {
-    throw new MessageNotifyException(format_string('Could not send notification using the "@notifier" notifier.', array('@notifier' => $notifier_name)));
+function message_notify_send_message(MessageInterface $message, array $options = [], $notifier_name = 'email') {
+  /** @var \Drupal\Core\Plugin\DefaultPluginManager $manager */
+  $manager = \Drupal::service('plugin.message_notify.notifier.manager');
+
+  if (!$plugin = $manager->getDefinition($notifier_name, FALSE)) {
+    throw new MessageNotifyException('Could not send notification using the "' . $notifier_name . '" notifier.');
   }
 
   $plugin['options'] = NestedArray::mergeDeep($plugin['options'], $options);
 
-  // @todo use core plugins
-  //  $class = ctools_plugin_load_class('message_notify', 'notifier', $notifier_name, 'class');
-  //  $notifier = new $class($plugin, $message);
-  //  if ($notifier->access()) {
-  //    return $notifier->send();
-  //  }
+  /** @var \Drupal\message_notify\Plugin\Notifier\MessageNotifierInterface $notifier */
+  $notifier = $manager->createInstance($notifier_name, $plugin);
+  if ($notifier->access()) {
+    return $notifier->send();
+  }
+  // @todo Throw exception instead?
+  return FALSE;
 }
 
 /**
@@ -156,22 +160,6 @@ function message_notify_ctools_plugin_directory($module, $plugin) {
   if ($module == 'message_notify') {
     return 'plugins/' . $plugin;
   }
-}
-
-/**
- * Helper function to include CTools plugins and get a notifier plguin.
- *
- * @param $plugin_name
- *   The plugin that should be laoded.
- */
-function message_notify_get_notifier($notifier_name) {
-  // @FIXME
-// Most CTools APIs have been moved into core.
-// 
-// @see https://www.drupal.org/node/2164623
-// ctools_include('plugins');
-
-  return \Drupal::service('plugin.manager.message_notify.notifier')->getDefinitions();
 }
 
 /**

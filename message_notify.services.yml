@@ -1,9 +1,9 @@
 services:
-  plugin.manager.message_notify.notifier:
+  plugin.message_notify.notifier.manager:
     class: Drupal\Core\Plugin\DefaultPluginManager
     arguments:
-      - Plugin/message_notify/notifier
+      - Plugin/Notifier
       - '@container.namespaces'
       - '@module_handler'
-      - Drupal\Component\Plugin\PluginBase
-      - Drupal\Component\Annotation\Plugin
+      - Drupal\message_notify\Plugin\Notifier\MessageNotifierInterface
+      - Drupal\message_notify\Annotation\Notifier
