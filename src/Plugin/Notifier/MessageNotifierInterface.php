@@ -17,17 +17,6 @@ use Drupal\message\MessageInterface;
 interface MessageNotifierInterface {
 
   /**
-   * Constructor for the notifier.
-   *
-   * @param $plugin
-   *   The notifier plugin object. Note the "options" values might have
-   *   been overriden in message_notify_send_message().
-   * @param \Drupal\message\MessageInterface $message
-   *   The Message entity.
-   */
-  public function __construct(MessageNotifierInterface $plugin, MessageInterface $message);
-
-  /**
    * Entry point to send and process a message.
    *
    * @return
@@ -48,10 +37,12 @@ interface MessageNotifierInterface {
   public function deliver(array $output = array());
 
   /**
-   * Post send operations.
+   * Act upon send result.
+   *
    * @param $result
+   *   The result from delivery.
    * @param array $output
-   * @return
+   *   The message output array.
    */
   public function postSend($result, array $output = array());
 
@@ -59,5 +50,14 @@ interface MessageNotifierInterface {
    * Determine if user can access notifier.
    */
   public function access();
+
+  /**
+   * Initialize the notifier.
+   *
+   * @todo can this be injected to the constructor?
+   *
+   * @param \Drupal\message\MessageInterface $message
+   */
+  public function init(MessageInterface $message);
 
 }

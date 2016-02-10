@@ -25,6 +25,13 @@ class MessageNotifyTest extends WebTestBase {
   protected $messageType;
 
   /**
+   * The message notification service.
+   *
+   * @var \Drupal\message_notify\MessageNotifier
+   */
+  protected $messageNotifier;
+
+  /**
    * {@inheritdoc}
    */
   public static $modules = ['message_notify_test'];
@@ -36,6 +43,8 @@ class MessageNotifyTest extends WebTestBase {
     parent::setUp();
 
     $this->messageType = MessageType::load('message_notify_test');
+
+    $this->messageNotifier = $this->container->get('message_notify.sender');
   }
 
   /**
@@ -45,7 +54,7 @@ class MessageNotifyTest extends WebTestBase {
    */
   public function testDeliver() {
     $message = Message::create(['type' => $this->messageType->id()]);
-    message_notify_send_message($message, array(), 'test');
+    $this->messageNotifier->send($message, [], 'test');
 
     // The test notifier added the output to the message.
     $output = $message->getText();
