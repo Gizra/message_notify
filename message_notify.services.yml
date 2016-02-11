@@ -10,3 +10,6 @@ services:
       - '@module_handler'
       - Drupal\message_notify\Plugin\Notifier\MessageNotifierInterface
       - Drupal\message_notify\Annotation\Notifier
+  logger.channel.message_notify:
+    parent: logger.channel_base
+    arguments: ['message_notify']

@@ -6,6 +6,7 @@
 
 namespace Drupal\message_notify\Plugin\Notifier;
 
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\message\MessageInterface;
 
 /**
@@ -14,7 +15,7 @@ use Drupal\message\MessageInterface;
  * Implementations that wish to provide an implementation of this should
  * register it using CTools' plugin system.
  */
-interface MessageNotifierInterface {
+interface MessageNotifierInterface extends ContainerFactoryPluginInterface {
 
   /**
    * Entry point to send and process a message.

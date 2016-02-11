@@ -7,8 +7,10 @@
 namespace Drupal\message_notify\Plugin\Notifier;
 
 use Drupal\Component\Plugin\PluginBase;
+use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\message\MessageInterface;
 use Drupal\message_notify\Exception\MessageNotifyException;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * An abstract implementation of MessageNotifierInterface.
@@ -23,15 +25,38 @@ abstract class MessageNotifierBase extends PluginBase implements MessageNotifier
   protected $message;
 
   /**
-   * {@inheritdoc}
+   * The logger channel.
+   *
+   * @var \Drupal\Core\Logger\LoggerChannelInterface
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition) {
+  protected $logger;
+
+  /**
+   * {@inheritdoc}
+   *
+   * @param \Drupal\Core\Logger\LoggerChannelInterface $logger
+   *   The message_notify logger channel.
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, LoggerChannelInterface $logger) {
     // Set some defaults.
     $configuration += [
       'save on success' => TRUE,
       'save on fail' => FALSE,
     ];
     parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->logger = $logger;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('logger.channel.message_notify')
+    );
   }
 
   /**
@@ -60,8 +85,7 @@ abstract class MessageNotifierBase extends PluginBase implements MessageNotifier
   public function postSend($result, array $output = []) {
     $save = FALSE;
     if (!$result) {
-      // @todo Inject logger.
-      \Drupal::logger('message_notify')->error(t('Could not send message using @title to user ID @uid.'), ['@label' => $plugin['title'], '@uid' => $message->uid]);
+      $this->logger->error('Could not send message using {title} to user ID {uid}.', ['{title}' => $this->pluginDefinition['title'], '{uid}' => $message->uid->entity->id()]);
       if ($this->configuration['save on fail']) {
         $save = TRUE;
       }
