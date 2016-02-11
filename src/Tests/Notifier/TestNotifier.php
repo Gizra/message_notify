@@ -16,7 +16,7 @@ class TestNotifier extends MessageNotifierBase {
   /**
    * {@inheritdoc}
    */
-  public function deliver(array $output = array()) {
+  public function deliver(array $output = []) {
     $this->message->output = $output;
     // Return TRUE or FALSE as it was set on the Message.
     return empty($this->fail);

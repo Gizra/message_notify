@@ -24,16 +24,28 @@ abstract class MessageNotifierBase extends PluginBase implements MessageNotifier
 
   /**
    * {@inheritdoc}
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition) {
+    // Set some defaults.
+    $configuration += [
+      'save on success' => TRUE,
+      'save on fail' => FALSE,
+    ];
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+  }
+
+  /**
+   * {@inheritdoc}
    *
    * @throws \Drupal\message_notify\Plugin\Notifier\MessageNotifyException
    */
   public function send() {
     $message = $this->message;
     $output = [];
-    foreach ($this->configuration['view_modes'] as $view_mode => $value) {
-      $content = $message->buildContent($view_mode);
-      $output[$view_mode] = render($content);
-    }
+    // @todo What to do about view modes?
+    // foreach ($this->configuration['view_modes'] as $view_mode => $value) {
+    $output['default'] = $message->getText();
+
     $result = $this->deliver($output);
     $this->postSend($result, $output);
     return $result;
@@ -59,17 +71,17 @@ abstract class MessageNotifierBase extends PluginBase implements MessageNotifier
     }
 
     // @todo Port this bit to 8.
-    if ($options['rendered fields']) {
-      // Save the rendered output into matching fields.
-      $wrapper = entity_metadata_wrapper('message', $message);
-      foreach ($this->plugin['view_modes'] as $view_mode => $mode) {
+    if (isset($this->configuration['rendered fields'])) {
+      // @todo View mode support.
+      foreach ($this->configuration['view_modes'] as $view_mode => $mode) {
         if (empty($options['rendered fields'][$view_mode])) {
           throw new MessageNotifyException('The rendered view mode "' . $view_mode . '" cannot be saved to field, as there is not a matching one.');
         }
         $field_name = $options['rendered fields'][$view_mode];
 
+        // @todo Inject the content_type.manager if this check is needed.
         if (!$field = field_info_field($field_name)) {
-          throw new MessageNotifyException(format_string('Field @field does not exist.', ['@field' => $field_name]));
+          throw new MessageNotifyException('Field "' . $field_name . '"" does not exist.');
         }
 
         // Get the format from the field. We assume the first delta is the
