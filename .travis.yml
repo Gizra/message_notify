@@ -48,6 +48,8 @@ install:
   - git clone --branch $DRUPAL_VERSION $DRUPAL_REPO drupal --depth 1
   - mv /tmp/$MODULE_NAME drupal/modules/
   - cd drupal
+  # Install the message module from github
+  - cd modules && git clone -b 8.x-1.x https://github.com/Gizra/message.git && cd -
 
 before_script:
 
