@@ -11,6 +11,8 @@ use Drupal\message_notify\Exception\MessageNotifyException;
 /**
  * @file
  * SMS notifier.
+ *
+ * @todo Add plugin definition.
  */
 class MessageNotifierSMS extends MessageNotifierBase {
 

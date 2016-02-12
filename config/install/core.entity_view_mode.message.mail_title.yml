@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - message
+id: message.mail_title
+label: 'Notify - Email subject'
+targetEntityType: message
+cache: true

@@ -54,11 +54,14 @@ class MessageNotifyTest extends WebTestBase {
    */
   public function testDeliver() {
     $message = Message::create(['type' => $this->messageType->id()]);
+    $message->message_text_another = 'another field';
     $this->messageNotifier->send($message, [], 'test');
 
     // The test notifier added the output to the message.
-    $output = $message->getText();
+    $output = $message->output;
 
+    $this->assertEqual($output['foo'], $message->get('text')->get(0)->getValue());
+    $this->assertEqual($output['bar'], $message->get('message_text_another')->get(0)->getValue());
     // @todo 7.x was expecting an array keyed by view mode. 8.x is a string.
     // $this->assertEqual($output['foo'], $wrapper->{MESSAGE_FIELD_MESSAGE_TEXT}->get(1)->value->value(), 'Correct values rendered in first view mode.');
     // $this->assertEqual($output['bar'], $wrapper->message_text_another->value(), 'Correct values rendered in second view mode.');

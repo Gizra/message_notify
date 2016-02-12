@@ -5,8 +5,8 @@ type: message_notify_test
 label: 'Message Notify Test'
 description: 'Message type for testing purposes.'
 text:
-  - "<p>first partial</p>\r\n"
-  - "<p>second partial</p>\r\n"
+  - "<p>first partial</p>"
+  - "<p>second partial</p>"
 data:
   'token options':
     clear: false

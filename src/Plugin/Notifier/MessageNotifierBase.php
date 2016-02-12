@@ -7,6 +7,7 @@
 namespace Drupal\message_notify\Plugin\Notifier;
 
 use Drupal\Component\Plugin\PluginBase;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\message\MessageInterface;
 use Drupal\message_notify\Exception\MessageNotifyException;
@@ -32,19 +33,30 @@ abstract class MessageNotifierBase extends PluginBase implements MessageNotifier
   protected $logger;
 
   /**
+   * The entity type manager service.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
    * {@inheritdoc}
    *
    * @param \Drupal\Core\Logger\LoggerChannelInterface $logger
    *   The message_notify logger channel.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, LoggerChannelInterface $logger) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, LoggerChannelInterface $logger, EntityTypeManagerInterface $entity_type_manager) {
     // Set some defaults.
     $configuration += [
       'save on success' => TRUE,
       'save on fail' => FALSE,
     ];
     parent::__construct($configuration, $plugin_id, $plugin_definition);
+
     $this->logger = $logger;
+    $this->entityTypeManager = $entity_type_manager;
   }
 
   /**
@@ -55,24 +67,25 @@ abstract class MessageNotifierBase extends PluginBase implements MessageNotifier
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('logger.channel.message_notify')
+      $container->get('logger.channel.message_notify'),
+      $container->get('entity_type.manager')
     );
   }
 
   /**
    * {@inheritdoc}
-   *
-   * @throws \Drupal\message_notify\Plugin\Notifier\MessageNotifyException
    */
   public function send() {
-    $message = $this->message;
     $output = [];
-    // @todo What to do about view modes?
-    // foreach ($this->configuration['view_modes'] as $view_mode => $value) {
-    $output['default'] = $message->getText();
+
+    $view_builder = $this->entityTypeManager->getViewBuilder('message');
+    foreach ($this->pluginDefinition['view_modes'] as $view_mode) {
+      $output[$view_mode] = $view_builder->view($this->message, $view_mode);
+    }
 
     $result = $this->deliver($output);
     $this->postSend($result, $output);
+
     return $result;
   }
 

@@ -31,4 +31,20 @@ class Notifier extends Plugin {
    */
   public $title;
 
+  /**
+   * The description.
+   *
+   * @ingroup plugin_translatable
+   *
+   * @var \Drupal\Core\Annotation\Translation
+   */
+  public $description;
+
+  /**
+   * Available view modes.
+   *
+   * @var array
+   */
+  public $view_modes;
+
 }

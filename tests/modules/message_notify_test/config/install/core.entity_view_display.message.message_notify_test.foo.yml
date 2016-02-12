@@ -4,17 +4,16 @@ dependencies:
   config:
     - field.field.message.message_notify_test.message_text_another
     - message.type.message_notify_test
-id: message.message_notify_test.default
+id: message.message_notify_test.foo
 targetEntityType: message
 bundle: message_notify_test
-mode: default
+mode: foo
 content:
   message_text_another:
-    weight: 1
+    weight: -10
+    settings: { }
+    third_party_settings: { }
     label: hidden
-    settings: {  }
-    third_party_settings: {  }
-    type: basic_string
   partial_1:
     weight: 0
     settings: {  }

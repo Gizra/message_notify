@@ -6,6 +6,7 @@
 
 namespace Drupal\message_notify\Plugin\Notifier;
 
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Mail\MailManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -15,7 +16,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @Notifier(
  *   id = "email",
- *   title = @Translation("E-mail notifier")
+ *   title = @Translation("Email"),
+ *   description = @Translation("Send messages via email"),
+ *   view_modes = {
+ *     "mail_title",
+ *     "mail_body"
+ *   }
  * )
  */
 class MessageNotifierEmail extends MessageNotifierBase {
@@ -34,14 +40,14 @@ class MessageNotifierEmail extends MessageNotifierBase {
    *
    * @param \Drupal\Core\Mail\MailManagerInterface $mail_manager
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, LoggerChannelInterface $logger, MailManagerInterface $mail_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, LoggerChannelInterface $logger, EntityTypeManagerInterface $entity_type_manager, MailManagerInterface $mail_manager) {
     // Set configuration defaults.
     $configuration += [
       'mail' => FALSE,
       'language override' => FALSE,
     ];
 
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $logger);
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $logger, $entity_type_manager);
 
     $this->mailManager = $mail_manager;
   }
@@ -55,6 +61,7 @@ class MessageNotifierEmail extends MessageNotifierBase {
       $plugin_id,
       $plugin_definition,
       $container->get('logger.channel.message_notify'),
+      $container->get('entity_type.manager'),
       $container->get('plugin.manager.mail')
     );
   }
