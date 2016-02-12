@@ -30,7 +30,7 @@ class MessageNotifierTest extends MessageNotifierBase {
     $this->message->output = $output;
 
     // Return TRUE or FALSE as it was set on the Message.
-    return empty($this->fail);
+    return empty($this->message->fail);
   }
 
 }

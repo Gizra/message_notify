@@ -98,7 +98,7 @@ abstract class MessageNotifierBase extends PluginBase implements MessageNotifier
   public function postSend($result, array $output = []) {
     $save = FALSE;
     if (!$result) {
-      $this->logger->error('Could not send message using {title} to user ID {uid}.', ['{title}' => $this->pluginDefinition['title'], '{uid}' => $message->uid->entity->id()]);
+      $this->logger->error('Could not send message using {title} to user ID {uid}.', ['{title}' => $this->pluginDefinition['title'], '{uid}' => $this->message->uid->entity->id()]);
       if ($this->configuration['save on fail']) {
         $save = TRUE;
       }

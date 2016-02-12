@@ -9,6 +9,7 @@ namespace Drupal\message_notify\Tests;
 use Drupal\message\Entity\Message;
 use Drupal\message\Entity\MessageType;
 use Drupal\simpletest\KernelTestBase;
+use Drupal\user\Entity\User;
 
 /**
  * Test the Message notifier plugins handling.
@@ -53,6 +54,7 @@ class MessageNotifyTest extends KernelTestBase {
     $this->installEntitySchema('message_type');
     $this->installEntitySchema('message');
     $this->installConfig(['message', 'message_notify_test']);
+    $this->installSchema('system', ['sequences']);
 
     $this->messageType = MessageType::load('message_notify_test');
 
@@ -72,23 +74,26 @@ class MessageNotifyTest extends KernelTestBase {
     // The test notifier added the output to the message.
     $output = $message->output;
 
-    $this->assertEqual($output['foo'], $message->get('text')->get(0)->getValue());
-    $this->assertEqual($output['bar'], $message->get('message_text_another')->get(0)->getValue());
-    // @todo 7.x was expecting an array keyed by view mode. 8.x is a string.
-    // $this->assertEqual($output['foo'], $wrapper->{MESSAGE_FIELD_MESSAGE_TEXT}->get(1)->value->value(), 'Correct values rendered in first view mode.');
-    // $this->assertEqual($output['bar'], $wrapper->message_text_another->value(), 'Correct values rendered in second view mode.');
+    $text = $message->getText();
+    // @todo The extra field should also be displaying
+    // @see https://github.com/Gizra/message/issues/35#issuecomment-183469111
+    // @todo Should this be rendered in the notifier plugin?
+    $this->assertEqual($text[1], $output['foo']['#markup']);
+    $this->assertEqual($text[0], $output['bar']['#markup']);
   }
 
   /**
    * Test Message save on delivery.
    */
   public function testPostSendMessageSave() {
-    $message = Message::create(['type' => $this->messageType->id()]);
+    $account = User::create(['name' => $this->randomMachineName()]);
+    $account->save();
+    $message = Message::create(['type' => $this->messageType->id(), 'uid' => $account->id()]);
     $message->fail = FALSE;
     $this->messageNotifier->send($message, [], 'test');
     $this->assertTrue($message->id(), 'Message saved after successful delivery.');
 
-    $message = Message::create(['type' => $this->messageType->id()]);
+    $message = Message::create(['type' => $this->messageType->id(), 'uid' => $account->id()]);
     $message->fail = TRUE;
     $this->messageNotifier->send($message, [], 'test');
     $this->assertFalse($message->id(), 'Message not saved after unsuccessful delivery.');
@@ -99,13 +104,13 @@ class MessageNotifyTest extends KernelTestBase {
       'save on success' => FALSE,
     ];
 
-    $message = Message::create(['type' => $this->messageType->id()]);
+    $message = Message::create(['type' => $this->messageType->id(), 'uid' => $account->id()]);
     // @todo See above.
     $message->fail = FALSE;
     $this->messageNotifier->send($message, $options, 'test');
     $this->assertTrue($message->isNew(), 'Message not saved after successful delivery.');
 
-    $message = Message::create(['type' => $this->messageType->id()]);
+    $message = Message::create(['type' => $this->messageType->id(), 'uid' => $account->id()]);
     $message->fail = TRUE;
     $this->messageNotifier->send($message, $options, 'test');
     $this->assertTrue($message->isNew(), 'Message not saved after unsuccessful delivery.');
