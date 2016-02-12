@@ -6,6 +6,10 @@
 
 namespace Drupal\message_notify\Plugin\Notifier;
 
+use Drupal\Core\Logger\LoggerChannelInterface;
+use Drupal\Core\Mail\MailManagerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 /**
  * Email notifier.
  *
@@ -17,32 +21,73 @@ namespace Drupal\message_notify\Plugin\Notifier;
 class MessageNotifierEmail extends MessageNotifierBase {
 
   /**
+   * The mail manager service.
+   *
+   * @var \Drupal\Core\Mail\MailManagerInterface
+   */
+  protected $mailManager;
+
+  /**
+   * Constructs the email notifier plugin.
+   *
+   * {@inheritdoc}
+   *
+   * @param \Drupal\Core\Mail\MailManagerInterface $mail_manager
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, LoggerChannelInterface $logger, MailManagerInterface $mail_manager) {
+    // Set configuration defaults.
+    $configuration += [
+      'mail' => FALSE,
+      'language override' => FALSE,
+    ];
+
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $logger);
+
+    $this->mailManager = $mail_manager;
+  }
+
+  /**
    * {@inheritdoc}
    */
-  public function deliver(array $output = array()) {
-    $plugin = $this->plugin;
-    $message = $this->message;
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('logger.channel.message_notify'),
+      $container->get('plugin.manager.mail')
+    );
+  }
 
-    $options = $plugin['options'];
+  /**
+   * {@inheritdoc}
+   */
+  public function deliver(array $output = []) {
+    /** @var \Drupal\user\UserInterface $account */
+    $account = $this->message->uid->entity;
+    $mail = $this->configuration['mail'] ?: $account->getEmail();
 
-    $account = \Drupal::entityManager()->getStorage('user')->load($message->uid);
-    $mail = $options['mail'] ? $options['mail'] : $account->mail;
-
-    $languages = language_list();
-    if (!$options['language override']) {
-      $lang = !empty($account->language) && $account->language != \Drupal\Core\Language\Language::LANGCODE_NOT_SPECIFIED ? $languages[$account->language]: language_default();
+    if (!$this->configuration['language override']) {
+      $language = $account->getPreferredLangcode();
     }
     else {
-      $lang = $languages[$message->language];
+      $language = $this->message->language()->getId();
     }
 
     // The subject in an email can't be with HTML, so strip it.
     $output['message_notify_email_subject'] = strip_tags($output['message_notify_email_subject']);
 
     // Pass the message entity along to hook_drupal_mail().
-    $output['message_entity'] = $message;
+    $output['message_entity'] = $this->message;
 
-    $result =  drupal_mail('message_notify', $message->type, $mail, $lang, $output);
+    $result =  $this->mailManager->mail(
+      'message_notify',
+      $this->message->getType()->id(),
+      $mail,
+      $language,
+      $output
+    );
+
     return $result['result'];
   }
 
