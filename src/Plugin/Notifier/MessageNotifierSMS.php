@@ -18,9 +18,10 @@ class MessageNotifierSMS extends MessageNotifierBase {
    * {@inheritdoc}
    */
   public function deliver(array $output = array()) {
+    throw new MessageNotifyException('This functionality depends on the SMS Framework module. See: https://www.drupal.org/node/2582937');
     if (empty($this->message->smsNumber)) {
       // Try to get the SMS number from the account.
-      $account = \Drupal::entityManager()->getStorage('user')->load($this->message->uid);
+      $account = $this->message->uid->entitiy;
       if (!empty($account->sms_user['number'])) {
         $this->message->smsNumber = $account->sms_user['number'];
       }
