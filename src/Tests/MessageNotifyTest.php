@@ -8,14 +8,14 @@ namespace Drupal\message_notify\Tests;
 
 use Drupal\message\Entity\Message;
 use Drupal\message\Entity\MessageType;
-use Drupal\simpletest\WebTestBase;
+use Drupal\simpletest\KernelTestBase;
 
 /**
  * Test the Message notifier plugins handling.
  *
  * @group message_notify
  */
-class MessageNotifyTest extends WebTestBase {
+class MessageNotifyTest extends KernelTestBase {
 
   /**
    * Testing message type.
@@ -34,13 +34,25 @@ class MessageNotifyTest extends WebTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['message_notify_test'];
+  public static $modules = [
+    'message_notify_test',
+    'message_notify',
+    'message',
+    'user',
+    'system',
+    'field',
+  ];
 
   /**
    * {@inheritdoc}
    */
   public function setUp() {
     parent::setUp();
+
+    $this->installEntitySchema('user');
+    $this->installEntitySchema('message_type');
+    $this->installEntitySchema('message');
+    $this->installConfig(['message', 'message_notify_test']);
 
     $this->messageType = MessageType::load('message_notify_test');
 
