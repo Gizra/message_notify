@@ -75,10 +75,10 @@ class MessageNotifyTest extends KernelTestBase {
     $output = $message->output;
 
     $text = $message->getText();
-    // @todo The extra field should also be displaying
-    // @see https://github.com/Gizra/message/issues/35#issuecomment-183469111
     // @todo Should this be rendered in the notifier plugin?
+    $this->assertTrue(isset($output['foo']['message_text_another']));
     $this->assertEqual($text[1], $output['foo']['#markup']);
+    $this->assertFalse(isset($output['bar']['message_text_another']));
     $this->assertEqual($text[0], $output['bar']['#markup']);
   }
 
