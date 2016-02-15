@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains \Drupal\message_notify\Plugin\Notifier\MessageNotifierSMS.
+ * Contains \Drupal\message_notify\Plugin\Notifier\Sms.
  */
 
 namespace Drupal\message_notify\Plugin\Notifier;
@@ -14,7 +14,7 @@ use Drupal\message_notify\Exception\MessageNotifyException;
  *
  * @todo Add plugin definition.
  */
-class MessageNotifierSMS extends MessageNotifierBase {
+class Sms extends MessageNotifierBase {
 
   /**
    * {@inheritdoc}

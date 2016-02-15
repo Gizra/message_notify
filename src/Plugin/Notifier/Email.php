@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains \Drupal\message_notify\Plugin\Notifier\MessageNotifierEmail.
+ * Contains \Drupal\message_notify\Plugin\Notifier\Email.
  */
 
 namespace Drupal\message_notify\Plugin\Notifier;
@@ -24,7 +24,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   }
  * )
  */
-class MessageNotifierEmail extends MessageNotifierBase {
+class Email extends MessageNotifierBase {
 
   /**
    * The mail manager service.
