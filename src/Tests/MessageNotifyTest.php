@@ -53,7 +53,7 @@ class MessageNotifyTest extends KernelTestBase {
     $this->installEntitySchema('user');
     $this->installEntitySchema('message_type');
     $this->installEntitySchema('message');
-    $this->installConfig(['message', 'message_notify_test']);
+    $this->installConfig(['message', 'message_notify', 'message_notify_test']);
     $this->installSchema('system', ['sequences']);
 
     $this->messageType = MessageType::load('message_notify_test');

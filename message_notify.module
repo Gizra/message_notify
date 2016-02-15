@@ -25,6 +25,23 @@ function message_notify_entity_bundle_create($entity_type_id, $bundle) {
     return;
   }
 
-  // Setup the subject and body display modes.
-  // @todo
+  $storage = \Drupal::entityTypeManager()->getStorage('entity_view_display');
+  /** @var \Drupal\Core\Entity\Display\EntityViewDisplayInterface $default */
+  $default = entity_get_display($entity_type_id, $bundle, 'default');
+
+  // Setup the subject/title display mode if it doesn't exist.
+  if (!$storage->load($entity_type_id . '.' . $bundle . '.mail_title')) {
+    $display = $default->createCopy('mail_title');
+    $display->set('content', ['partial_0' => ['weight' => 0]]);
+    $display->set('hidden', ['partial_1' => TRUE]);
+    $display->save();
+  }
+
+  // Setup the body display if it doesn't exist.
+  if (!$storage->load($entity_type_id . '.' . $bundle . '.mail_body')) {
+    $display = $default->createCopy('mail_body');
+    $display->set('content', ['partial_1' => ['weight' => 0]]);
+    $display->set('hidden', ['partial_0' => TRUE]);
+    $display->save();
+  }
 }
