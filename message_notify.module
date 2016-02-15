@@ -10,7 +10,7 @@
  * Set's the message subject and body as configured.
  */
 function message_notify_mail($key, &$message, $params) {
-  $message['subject'] = $params['mail_title'];
+  $message['subject'] = $params['mail_subject'];
   $message['body'][] = $params['mail_body'];
 }
 
@@ -30,8 +30,8 @@ function message_notify_entity_bundle_create($entity_type_id, $bundle) {
   $default = entity_get_display($entity_type_id, $bundle, 'default');
 
   // Setup the subject/title display mode if it doesn't exist.
-  if (!$storage->load($entity_type_id . '.' . $bundle . '.mail_title')) {
-    $display = $default->createCopy('mail_title');
+  if (!$storage->load($entity_type_id . '.' . $bundle . '.mail_subject')) {
+    $display = $default->createCopy('mail_subject');
     $display->set('content', ['partial_0' => ['weight' => 0]]);
     $display->set('hidden', ['partial_1' => TRUE]);
     $display->save();

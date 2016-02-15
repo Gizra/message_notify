@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   title = @Translation("Email"),
  *   description = @Translation("Send messages via email"),
  *   view_modes = {
- *     "mail_title",
+ *     "mail_subject",
  *     "mail_body"
  *   }
  * )
@@ -83,7 +83,7 @@ class Email extends MessageNotifierBase {
 
     // The subject in an email can't be with HTML, so strip it.
     // @todo Centralize rendering.
-    $output['mail_title'] = strip_tags($output['mail_title']['#markup']);
+    $output['mail_subject'] = strip_tags($output['mail_subject']['#markup']);
     $output['mail_body'] = $output['mail_body']['#markup'];
 
     // Pass the message entity along to hook_drupal_mail().
