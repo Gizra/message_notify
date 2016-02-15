@@ -57,38 +57,23 @@ function message_notify_entity_info_alter(&$entity_info) {
  * Set's the message subject and body as configured.
  */
 function message_notify_mail($key, &$message, $params) {
-  $message['subject'] = $params['message_notify_email_subject'];
-  $message['body'][] = $params['message_notify_email_body'];
+  $message['subject'] = $params['mail_title'];
+  $message['body'][] = $params['mail_body'];
 }
 
 /**
- * Implements hook_field_attach_create_bundle().
+ * Implements hook_entity_bundle_create().
  *
  * We cannot easily set the the visibilty of extra fields, so we set the
  * bundle settings upon creation of new message bundle.
  */
-function message_notify_entity_bundle_create($entity_type, $bundle) {
-  if ($entity_type != 'message') {
+function message_notify_entity_bundle_create($entity_type_id, $bundle) {
+  if ($entity_type_id != 'message') {
     return;
   }
 
-  $bundle_settings = field_bundle_settings('message', $bundle);
-  $display = &$bundle_settings['extra_fields']['display'];
-
-  $visible = array('visible' => TRUE, 'weight' => 0);
-  $hidden = array('visible' => FALSE, 'weight' => 0);
-
-  $display['message__message_text__0'] = array(
-    'message_notify_email_subject' => $visible,
-    'message_notify_email_body' => $hidden,
-  );
-
-  $display['message__message_text__1'] = array(
-    'message_notify_email_subject' => $hidden,
-    'message_notify_email_body' => $visible,
-  );
-
-  field_bundle_settings('message', $bundle, $bundle_settings);
+  // Setup the subject and body display modes.
+  // @todo
 }
 
 /**

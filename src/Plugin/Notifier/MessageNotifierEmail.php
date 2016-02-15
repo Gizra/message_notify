@@ -82,7 +82,9 @@ class MessageNotifierEmail extends MessageNotifierBase {
     }
 
     // The subject in an email can't be with HTML, so strip it.
-    $output['message_notify_email_subject'] = strip_tags($output['message_notify_email_subject']);
+    // @todo Centralize rendering.
+    $output['mail_title'] = strip_tags($output['mail_title']['#markup']);
+    $output['mail_body'] = $output['mail_body']['#markup'];
 
     // Pass the message entity along to hook_drupal_mail().
     $output['message_entity'] = $this->message;
