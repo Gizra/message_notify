@@ -5,22 +5,6 @@
  */
 
 /**
- * Implements hook_entity_info_alter().
- *
- * Add a the notifiers view modes.
- */
-function message_notify_entity_info_alter(&$entity_info) {
-  foreach (message_notify_get_notifiers() as $plugin) {
-    $view_modes = $plugin['view_modes'];
-    // Set default values.
-    foreach ($view_modes as &$view_mode) {
-      $view_mode += array('custom settings' => TRUE);
-    }
-    $entity_info['message']['view modes'] += $view_modes;
-  }
-}
-
-/**
  * Implements hook_mail().
  *
  * Set's the message subject and body as configured.
