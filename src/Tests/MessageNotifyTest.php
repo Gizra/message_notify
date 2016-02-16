@@ -6,8 +6,11 @@
 
 namespace Drupal\message_notify\Tests;
 
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\message\Entity\Message;
 use Drupal\message\Entity\MessageType;
+use Drupal\message_notify\Exception\MessageNotifyException;
 use Drupal\simpletest\KernelTestBase;
 use Drupal\user\Entity\User;
 
@@ -42,6 +45,7 @@ class MessageNotifyTest extends KernelTestBase {
     'user',
     'system',
     'field',
+    'text',
   ];
 
   /**
@@ -119,46 +123,43 @@ class MessageNotifyTest extends KernelTestBase {
   /**
    * Test populating the rednered output to fields.
    */
-  function testPostSendRenderedField() {
-    // @todo Fix this test.
-    $this->fail('Test not ported to 8.x');
-    return;
+  public function testPostSendRenderedField() {
     $this->attachRenderedFields();
 
     // Test plain fields.
-    $options = array(
-      'rendered fields' => array(
+    $options = [
+      'rendered fields' => [
         'foo' => 'rendered_foo',
         'bar' => 'rendered_bar',
-      ),
-    );
-    $message = message_create('foo');
-    message_notify_send_message($message, $options, 'test');
-    $wrapper = entity_metadata_wrapper('message', $message);
-    $this->assertTrue($wrapper->rendered_foo->value() && $wrapper->rendered_bar->value(), 'Message is rendered to fields.');
+      ],
+    ];
+
+    $message = Message::create(['type' => $this->messageType->id()]);
+    $this->messageNotifier->send($message, $options, 'test');
+    $this->assertTrue($message->rendered_foo->value && $message->rendered_bar->value, 'Message is rendered to fields.');
 
     // Test field with text-processing.
-    $options = array(
-      'rendered fields' => array(
+    $options = [
+      'rendered fields' => [
         'foo' => 'rendered_baz',
         'bar' => 'rendered_bar',
-      ),
-    );
-    $message = message_create('foo');
-    message_notify_send_message($message, $options, 'test');
-    $wrapper = entity_metadata_wrapper('message', $message);
-    $this->assertTrue($wrapper->rendered_baz->value->value() && $wrapper->rendered_bar->value(), 'Message is rendered to fields with text-processing.');
+      ],
+    ];
+
+    $message = Message::create(['type' => $this->messageType->id()]);
+    $this->messageNotifier->send($message, $options, 'test');
+    $this->assertTrue($message->rendered_baz->value && $message->rendered_bar->value, 'Message is rendered to fields with text-processing.');
 
     // Test missing view mode key in the rendered fields.
-    $options = array(
-      'rendered fields' => array(
+    $options = [
+      'rendered fields' => [
         'foo' => 'rendered_foo',
         // No "bar" field.
-      ),
-    );
-    $message = message_create('foo');
+      ],
+    ];
+    $message = Message::create(['type' => $this->messageType->id()]);
     try {
-      message_notify_send_message($message, $options, 'test');
+      $this->messageNotifier->send($message, $options, 'test');
       $this->fail('Can save rendered message with missing view mode.');
     }
     catch (MessageNotifyException $e) {
@@ -166,15 +167,15 @@ class MessageNotifyTest extends KernelTestBase {
     }
 
     // Test invalid field name.
-    $options = array(
-      'rendered fields' => array(
+    $options = [
+      'rendered fields' => [
         'foo' => 'wrong_field',
         'bar' => 'rendered_bar',
-      ),
-    );
-    $message = message_create('foo');
+      ],
+    ];
+    $message = Message::create(['type' => $this->messageType->id()]);
     try {
-      message_notify_send_message($message, $options, 'test');
+      $this->messageNotifier->send($message, $options, 'test');
       $this->fail('Can save rendered message to non-existing field.');
     }
     catch (MessageNotifyException $e) {
@@ -185,44 +186,31 @@ class MessageNotifyTest extends KernelTestBase {
   /**
    * Helper function to attach rendred fields.
    *
-   * @see MessageNotifyNotifier::testPostSendRenderedField()
+   * @see MessageNotifyTest::testPostSendRenderedField()
    */
-  function attachRenderedFields() {
-    foreach (array('rendered_foo', 'rendered_bar', 'rendered_baz') as $field_name) {
-      $field = array(
+  protected function attachRenderedFields() {
+    foreach (['rendered_foo', 'rendered_bar', 'rendered_baz'] as $field_name) {
+      // Use formatted text for `baz`, plain for others.
+      $config = [
         'field_name' => $field_name,
-        'type' => 'text_long',
-        'entity_types' => array('message'),
-      );
-      // @FIXME
-// Fields and field instances are now exportable configuration entities, and
-// the Field Info API has been removed.
-// 
-// 
-// @see https://www.drupal.org/node/2012896
-// $field = field_create_field($field);
+        'type' => 'string_long',
+        'entity_type' => 'message',
+      ];
+      if ($field_name == 'rendered_baz') {
+        $config['type'] = 'text_long';
+      }
+      $field_storage = FieldStorageConfig::create($config);
+      $field_storage->save();
 
-      $instance = array(
+      $field = FieldConfig::create([
         'field_name' => $field_name,
-        'bundle' => 'foo',
+        'bundle' => $this->messageType->id(),
         'entity_type' => 'message',
         'label' => $field_name,
-      );
+      ]);
 
-      if ($field_name == 'rendered_baz') {
-        $instance['settings'] = array(
-          'text_processing' => 1,
-        );
-      }
-      // @FIXME
-// Fields and field instances are now exportable configuration entities, and
-// the Field Info API has been removed.
-// 
-// 
-// @see https://www.drupal.org/node/2012896
-// field_create_instance($instance);
-
+      $field->save();
     }
   }
-}
 
+}

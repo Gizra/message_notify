@@ -10,7 +10,7 @@
 function message_notify_example_field_default_fields() {
   $fields = array();
 
-  // Exported field: 'message-comment_insert-field_comment_ref'
+  // Exported field: 'message-comment_insert-field_comment_ref'.
   $fields['message-comment_insert-field_comment_ref'] = array(
     'field_config' => array(
       'active' => '1',
@@ -112,7 +112,7 @@ function message_notify_example_field_default_fields() {
     ),
   );
 
-  // Exported field: 'message-comment_insert-field_message_rendered_body'
+  // Exported field: 'message-comment_insert-field_message_rendered_body'.
   $fields['message-comment_insert-field_message_rendered_body'] = array(
     'field_config' => array(
       'active' => '1',
@@ -184,7 +184,7 @@ function message_notify_example_field_default_fields() {
     ),
   );
 
-  // Exported field: 'message-comment_insert-field_message_rendered_subject'
+  // Exported field: 'message-comment_insert-field_message_rendered_subject'.
   $fields['message-comment_insert-field_message_rendered_subject'] = array(
     'field_config' => array(
       'active' => '1',

@@ -5,6 +5,7 @@
  * Rules integration for the Message notify module.
  *
  * @addtogroup rules
+ *
  * @{
  */
 
@@ -86,18 +87,17 @@ function message_notify_rules_process(Message $message, $save_on_fail, $save_on_
   }
 
   if ($mail) {
-    $options['mail'] =  str_replace(array("\r", "\n"), '', $mail);
+    $options['mail'] = str_replace(array("\r", "\n"), '', $mail);
   }
 
   message_notify_send_message($message, $options, 'email');
 }
 
 /**
- * Options list; Return the text field attached to the selected message
+ * Options list; Return the text field attached to the selected message.
  */
 function message_notify_field_text_list() {
   $options = array(FALSE => '- ' . t('None') . ' -');
-
 
   foreach (field_info_instances('message') as $message_type => $instances) {
     foreach ($instances as $field_name => $instance) {

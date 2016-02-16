@@ -12,7 +12,7 @@ matrix:
 env:
   global:
     - MODULE_NAME='message_notify'
-    - MODULE_TEST_GROUP='Message Notify'
+    - MODULE_TEST_GROUP='message_notify'
     - DRUPAL_REPO='git://drupalcode.org/project/drupal.git'
     - DRUPAL_VERSION='8.0.x'
     - PHPCS_VERSION='2.5.*'
@@ -49,7 +49,9 @@ install:
   - mv /tmp/$MODULE_NAME drupal/modules/
   - cd drupal
   # Install the message module from github
-  - cd modules && git clone -b 8.x-1.x https://github.com/Gizra/message.git && cd -
+  # Use working branch until PRs are merged in main repo.
+  #- cd modules && git clone -b 8.x-1.x https://github.com/Gizra/message.git && cd -
+  - cd modules && git clone -b working https://github.com/jhedstrom/message.git && cd -
 
 before_script:
 
@@ -67,7 +69,7 @@ before_script:
 
   # Start a web server.
   - drush runserver 127.0.0.1:8080 &
-  - until netstat -an 2>/dev/null | grep '8080.*LISTEN'; do true; done
+  #- until netstat -an 2>/dev/null | grep '8080.*LISTEN'; do true; done
 
 script:
   # Run code sniffer.

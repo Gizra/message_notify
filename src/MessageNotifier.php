@@ -5,7 +5,6 @@
  */
 
 namespace Drupal\message_notify;
-use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\message\MessageInterface;
 use Drupal\message_notify\Exception\MessageNotifyException;
@@ -22,6 +21,12 @@ class MessageNotifier {
    */
   protected $notifierManager;
 
+  /**
+   * Constructs the message notifier.
+   *
+   * @param \Drupal\Core\Plugin\DefaultPluginManager $notifier_manager
+   *   The notifier plugin manager.
+   */
   public function __construct(DefaultPluginManager $notifier_manager) {
     $this->notifierManager = $notifier_manager;
   }
@@ -29,7 +34,7 @@ class MessageNotifier {
   /**
    * Process and send a message.
    *
-   * @param $message \Drupal\message\MessageInterface
+   * @param \Drupal\message\MessageInterface $message
    *   The message entity being used for the notification.
    * @param array $options
    *   Array of options to override the plugin's default ones.
