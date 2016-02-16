@@ -195,13 +195,12 @@ class MessageNotifyTest extends KernelTestBase {
         'entity_types' => array('message'),
       );
       // @FIXME
-// Fields and field instances are now exportable configuration entities, and
-// the Field Info API has been removed.
-// 
-// 
-// @see https://www.drupal.org/node/2012896
-// $field = field_create_field($field);
-
+      // Fields and field instances are now exportable configuration entities, and
+      // the Field Info API has been removed.
+      //
+      //
+      // @see https://www.drupal.org/node/2012896
+      // $field = field_create_field($field);
       $instance = array(
         'field_name' => $field_name,
         'bundle' => 'foo',
@@ -215,14 +214,13 @@ class MessageNotifyTest extends KernelTestBase {
         );
       }
       // @FIXME
-// Fields and field instances are now exportable configuration entities, and
-// the Field Info API has been removed.
-// 
-// 
-// @see https://www.drupal.org/node/2012896
-// field_create_instance($instance);
-
+      // Fields and field instances are now exportable configuration entities, and
+      // the Field Info API has been removed.
+      //
+      //
+      // @see https://www.drupal.org/node/2012896
+      // field_create_instance($instance);
     }
   }
-}
 
+}

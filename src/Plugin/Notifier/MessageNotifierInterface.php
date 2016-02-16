@@ -20,7 +20,7 @@ interface MessageNotifierInterface extends ContainerFactoryPluginInterface {
   /**
    * Entry point to send and process a message.
    *
-   * @return
+   * @return bool
    *   TRUE or FALSE based on delivery status.
    */
   public function send();
@@ -32,7 +32,7 @@ interface MessageNotifierInterface extends ContainerFactoryPluginInterface {
    *   Array keyed by the view mode, and the rendered entity in the
    *   specified view mode.
    *
-   * @return
+   * @return bool
    *   TRUE or FALSE based on delivery status.
    */
   public function deliver(array $output = array());
@@ -40,7 +40,7 @@ interface MessageNotifierInterface extends ContainerFactoryPluginInterface {
   /**
    * Act upon send result.
    *
-   * @param $result
+   * @param bool $result
    *   The result from delivery.
    * @param array $output
    *   The message output array.
@@ -58,6 +58,7 @@ interface MessageNotifierInterface extends ContainerFactoryPluginInterface {
    * @todo can this be injected to the constructor?
    *
    * @param \Drupal\message\MessageInterface $message
+   *   The message entity.
    */
   public function init(MessageInterface $message);
 

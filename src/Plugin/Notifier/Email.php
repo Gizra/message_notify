@@ -39,6 +39,7 @@ class Email extends MessageNotifierBase {
    * {@inheritdoc}
    *
    * @param \Drupal\Core\Mail\MailManagerInterface $mail_manager
+   *   The mail manager service.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, LoggerChannelInterface $logger, EntityTypeManagerInterface $entity_type_manager, MailManagerInterface $mail_manager) {
     // Set configuration defaults.
@@ -89,7 +90,7 @@ class Email extends MessageNotifierBase {
     // Pass the message entity along to hook_drupal_mail().
     $output['message_entity'] = $this->message;
 
-    $result =  $this->mailManager->mail(
+    $result = $this->mailManager->mail(
       'message_notify',
       $this->message->getType()->id(),
       $mail,

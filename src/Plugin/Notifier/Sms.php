@@ -29,8 +29,8 @@ class Sms extends MessageNotifierBase {
       }
     }
 
-    if (empty($this->message->smsNumber)){
-      throw new MessageNotifyException ('Message cannot be sent using SMS as the "smsNumber" property is missing from the Message entity or user entity.');
+    if (empty($this->message->smsNumber)) {
+      throw new MessageNotifyException('Message cannot be sent using SMS as the "smsNumber" property is missing from the Message entity or user entity.');
     }
 
     return sms_send($this->message->smsNumber, strip_tags($output['message_notify_sms_body']));

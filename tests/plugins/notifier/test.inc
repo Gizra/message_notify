@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @file
+ */
+
 $plugin = array(
   'title' => t('Test'),
   'description' => t('Notifier used for testing.'),
