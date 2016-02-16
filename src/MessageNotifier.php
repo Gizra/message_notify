@@ -22,7 +22,10 @@ class MessageNotifier {
   protected $notifierManager;
 
   /**
+   * Constructs the message notifier.
    *
+   * @param \Drupal\Core\Plugin\DefaultPluginManager $notifier_manager
+   *   The notifier plugin manager.
    */
   public function __construct(DefaultPluginManager $notifier_manager) {
     $this->notifierManager = $notifier_manager;

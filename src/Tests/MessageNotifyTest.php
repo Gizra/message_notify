@@ -186,9 +186,9 @@ class MessageNotifyTest extends KernelTestBase {
   /**
    * Helper function to attach rendred fields.
    *
-   * @see MessageNotifyNotifier::testPostSendRenderedField()
+   * @see MessageNotifyTest::testPostSendRenderedField()
    */
-  function attachRenderedFields() {
+  protected function attachRenderedFields() {
     foreach (['rendered_foo', 'rendered_bar', 'rendered_baz'] as $field_name) {
       // Use formatted text for `baz`, plain for others.
       $config = [
