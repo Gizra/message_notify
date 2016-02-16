@@ -1,0 +1,17 @@
+langcode: en
+status: true
+dependencies: {  }
+type: message_notify_test
+label: 'Message Notify Test'
+description: 'Message type for testing purposes.'
+text:
+  - "<p>first partial</p>"
+  - "<p>second partial</p>"
+data:
+  'token options':
+    clear: false
+  purge:
+    override: false
+    enabled: false
+    quota: null
+    days: null

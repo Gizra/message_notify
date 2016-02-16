@@ -1,0 +1,7 @@
+name: 'Message notify test module'
+description: 'Functionality to assist Message notify testing.'
+type: module
+core: 8.x
+dependencies:
+  - message_notify
+package: Testing
