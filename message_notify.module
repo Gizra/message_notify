@@ -4,6 +4,8 @@
  * Message notify module.
  */
 
+use Drupal\Core\Entity\Entity\EntityViewMode;
+
 /**
  * Implements hook_mail().
  *
@@ -22,6 +24,11 @@ function message_notify_mail($key, &$message, $params) {
  */
 function message_notify_entity_bundle_create($entity_type_id, $bundle) {
   if ($entity_type_id != 'message') {
+    return;
+  }
+
+  // Do nothing if these view modes are not yet available.
+  if (!EntityViewMode::load('message.mail_body') || !EntityViewMode::load('message.mail_subject')) {
     return;
   }
 
