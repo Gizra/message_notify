@@ -98,7 +98,7 @@ abstract class MessageNotifierBase implements MessageNotifierInterface {
 
     $save = FALSE;
     if (!$result) {
-      watchdog('message_notify', t('Could not send message using @title to user ID @uid.'), array('@label' => $plugin['title'], '@uid' => $message->uid), WATCHDOG_ERROR);
+      watchdog('message_notify', t('Could not send message using @title to user ID @uid.'), array('@title' => $plugin['title'], '@uid' => $message->uid), WATCHDOG_ERROR);
       if ($options['save on fail']) {
         $save = TRUE;
       }
