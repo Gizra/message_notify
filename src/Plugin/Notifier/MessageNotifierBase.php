@@ -1,8 +1,4 @@
 <?php
-/**
- * @file
- * Contains \Drupal\message_notify\Plugin\Notifier\MessageNotifierBase.
- */
 
 namespace Drupal\message_notify\Plugin\Notifier;
 
@@ -46,7 +42,7 @@ abstract class MessageNotifierBase extends PluginBase implements MessageNotifier
    *   The message_notify logger channel.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
-   * @param \Drupal\message\MessageInterface
+   * @param \Drupal\message\MessageInterface $message
    *   The message entity.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, LoggerChannelInterface $logger, EntityTypeManagerInterface $entity_type_manager, MessageInterface $message) {

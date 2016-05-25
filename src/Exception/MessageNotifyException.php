@@ -1,8 +1,4 @@
 <?php
-/**
- * @file
- * Contains \Drupal\message_notify\Exception\MessageNotifyException.
- */
 
 namespace Drupal\message_notify\Exception;
 

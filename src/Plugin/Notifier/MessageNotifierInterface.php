@@ -1,13 +1,8 @@
 <?php
-/**
- * @file
- * Contains \Drupal\message_notify\Plugin\Notifier\MessageNotifierInterface.
- */
 
 namespace Drupal\message_notify\Plugin\Notifier;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\message\MessageInterface;
 
 /**
  * Additional behaviors for a Entity Reference field.

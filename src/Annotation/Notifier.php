@@ -1,8 +1,4 @@
 <?php
-/**
- * @file
- * Contains \Drupal\message_notify\Annotation\Notifier.
- */
 
 namespace Drupal\message_notify\Annotation;
 
