@@ -5,9 +5,10 @@
  */
 
 namespace Drupal\message_notify;
-use Drupal\Core\Plugin\DefaultPluginManager;
+
 use Drupal\message\MessageInterface;
 use Drupal\message_notify\Exception\MessageNotifyException;
+use Drupal\message_notify\Plugin\Notifier\Manager;
 
 /**
  * Prepare and send notifications.
@@ -17,17 +18,17 @@ class MessageNotifier {
   /**
    * The notifier plugin manager.
    *
-   * @var \Drupal\Core\Plugin\DefaultPluginManager
+   * @var \Drupal\message_notify\Plugin\Notifier\Manager
    */
   protected $notifierManager;
 
   /**
    * Constructs the message notifier.
    *
-   * @param \Drupal\Core\Plugin\DefaultPluginManager $notifier_manager
+   * @param \Drupal\message_notify\Plugin\Notifier\Manager $notifier_manager
    *   The notifier plugin manager.
    */
-  public function __construct(DefaultPluginManager $notifier_manager) {
+  public function __construct(Manager $notifier_manager) {
     $this->notifierManager = $notifier_manager;
   }
 
@@ -54,9 +55,7 @@ class MessageNotifier {
     }
 
     /** @var \Drupal\message_notify\Plugin\Notifier\MessageNotifierInterface $notifier */
-    $notifier = $this->notifierManager->createInstance($notifier_name, $options);
-    // @todo Can this be injected to the constructor?
-    $notifier->init($message);
+    $notifier = $this->notifierManager->createInstance($notifier_name, $options, $message);
 
     if ($notifier->access()) {
       return $notifier->send();

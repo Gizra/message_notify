@@ -52,14 +52,4 @@ interface MessageNotifierInterface extends ContainerFactoryPluginInterface {
    */
   public function access();
 
-  /**
-   * Initialize the notifier.
-   *
-   * @todo can this be injected to the constructor?
-   *
-   * @param \Drupal\message\MessageInterface $message
-   *   The message entity.
-   */
-  public function init(MessageInterface $message);
-
 }

@@ -22,7 +22,7 @@ class EmailNotifierTest extends WebTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['message_notify_test'];
+  public static $modules = ['message_notify_test', 'text'];
 
   /**
    * Testing message type.

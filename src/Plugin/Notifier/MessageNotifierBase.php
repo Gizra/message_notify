@@ -46,8 +46,10 @@ abstract class MessageNotifierBase extends PluginBase implements MessageNotifier
    *   The message_notify logger channel.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
+   * @param \Drupal\message\MessageInterface
+   *   The message entity.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, LoggerChannelInterface $logger, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, LoggerChannelInterface $logger, EntityTypeManagerInterface $entity_type_manager, MessageInterface $message) {
     // Set some defaults.
     $configuration += [
       'save on success' => TRUE,
@@ -57,18 +59,20 @@ abstract class MessageNotifierBase extends PluginBase implements MessageNotifier
 
     $this->logger = $logger;
     $this->entityTypeManager = $entity_type_manager;
+    $this->message = $message;
   }
 
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, MessageInterface $message = NULL) {
     return new static(
       $configuration,
       $plugin_id,
       $plugin_definition,
       $container->get('logger.channel.message_notify'),
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $message
     );
   }
 
@@ -142,13 +146,6 @@ abstract class MessageNotifierBase extends PluginBase implements MessageNotifier
    */
   public function access() {
     return TRUE;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function init(MessageInterface $message) {
-    $this->message = $message;
   }
 
 }
