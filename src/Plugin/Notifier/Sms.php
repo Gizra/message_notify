@@ -1,8 +1,4 @@
 <?php
-/**
- * @file
- * Contains \Drupal\message_notify\Plugin\Notifier\Sms.
- */
 
 namespace Drupal\message_notify\Plugin\Notifier;
 

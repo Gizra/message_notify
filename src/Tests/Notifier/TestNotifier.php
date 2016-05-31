@@ -1,12 +1,8 @@
 <?php
-/**
- * @file
- * Contains \Drupal\message_notify\Tests\Notifier\TestNotifier.
- */
 
 namespace Drupal\message_notify\Tests\Notifier;
 
-use Drupal\message_notify\MessageNotifierBase;
+use Drupal\message_notify\Plugin\Notifier\MessageNotifierBase;
 
 /**
  * Test notifier.

@@ -3,7 +3,7 @@ services:
     class: Drupal\message_notify\MessageNotifier
     arguments: ['@plugin.message_notify.notifier.manager']
   plugin.message_notify.notifier.manager:
-    class: Drupal\Core\Plugin\DefaultPluginManager
+    class: Drupal\message_notify\Plugin\Notifier\Manager
     arguments:
       - Plugin/Notifier
       - '@container.namespaces'

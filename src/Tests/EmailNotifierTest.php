@@ -1,8 +1,4 @@
 <?php
-/**
- * @file
- * Contains \Drupal\message_notify\Tests\EmailNotifierTest.
- */
 
 namespace Drupal\message_notify\Tests;
 
@@ -22,7 +18,7 @@ class EmailNotifierTest extends WebTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['message_notify_test'];
+  public static $modules = ['message_notify_test', 'text'];
 
   /**
    * Testing message type.

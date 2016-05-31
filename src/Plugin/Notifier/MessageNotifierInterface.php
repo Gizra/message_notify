@@ -1,13 +1,8 @@
 <?php
-/**
- * @file
- * Contains \Drupal\message_notify\Plugin\Notifier\MessageNotifierInterface.
- */
 
 namespace Drupal\message_notify\Plugin\Notifier;
 
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\message\MessageInterface;
 
 /**
  * Additional behaviors for a Entity Reference field.
@@ -51,15 +46,5 @@ interface MessageNotifierInterface extends ContainerFactoryPluginInterface {
    * Determine if user can access notifier.
    */
   public function access();
-
-  /**
-   * Initialize the notifier.
-   *
-   * @todo can this be injected to the constructor?
-   *
-   * @param \Drupal\message\MessageInterface $message
-   *   The message entity.
-   */
-  public function init(MessageInterface $message);
 
 }

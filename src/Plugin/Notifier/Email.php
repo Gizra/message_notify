@@ -1,14 +1,11 @@
 <?php
-/**
- * @file
- * Contains \Drupal\message_notify\Plugin\Notifier\Email.
- */
 
 namespace Drupal\message_notify\Plugin\Notifier;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Mail\MailManagerInterface;
+use Drupal\message\MessageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -41,14 +38,14 @@ class Email extends MessageNotifierBase {
    * @param \Drupal\Core\Mail\MailManagerInterface $mail_manager
    *   The mail manager service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, LoggerChannelInterface $logger, EntityTypeManagerInterface $entity_type_manager, MailManagerInterface $mail_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, LoggerChannelInterface $logger, EntityTypeManagerInterface $entity_type_manager, MessageInterface $message, MailManagerInterface $mail_manager) {
     // Set configuration defaults.
     $configuration += [
       'mail' => FALSE,
       'language override' => FALSE,
     ];
 
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $logger, $entity_type_manager);
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $logger, $entity_type_manager, $message);
 
     $this->mailManager = $mail_manager;
   }
@@ -56,13 +53,14 @@ class Email extends MessageNotifierBase {
   /**
    * {@inheritdoc}
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition, MessageInterface $message = NULL) {
     return new static(
       $configuration,
       $plugin_id,
       $plugin_definition,
       $container->get('logger.channel.message_notify'),
       $container->get('entity_type.manager'),
+      $message,
       $container->get('plugin.manager.mail')
     );
   }
