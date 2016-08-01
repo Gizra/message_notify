@@ -90,7 +90,7 @@ class Email extends MessageNotifierBase {
 
     $result = $this->mailManager->mail(
       'message_notify',
-      $this->message->getType()->id(),
+      $this->message->getTemplate()->id(),
       $mail,
       $language,
       $output
