@@ -3,5 +3,6 @@ description: 'Functionality to assist Message notify testing.'
 type: module
 core: 8.x
 dependencies:
+  - field
   - message_notify
 package: Testing
