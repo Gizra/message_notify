@@ -3,7 +3,7 @@ status: true
 dependencies:
   config:
     - field.field.message.message_notify_test.message_text_another
-    - message.type.message_notify_test
+    - message.template.message_notify_test
 id: message.message_notify_test.foo
 targetEntityType: message
 bundle: message_notify_test

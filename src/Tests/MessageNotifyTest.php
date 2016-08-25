@@ -5,7 +5,7 @@ namespace Drupal\message_notify\Tests;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\message\Entity\Message;
-use Drupal\message\Entity\MessageType;
+use Drupal\message\Entity\MessageTemplate;
 use Drupal\message_notify\Exception\MessageNotifyException;
 use Drupal\simpletest\KernelTestBase;
 use Drupal\user\Entity\User;
@@ -18,11 +18,11 @@ use Drupal\user\Entity\User;
 class MessageNotifyTest extends KernelTestBase {
 
   /**
-   * Testing message type.
+   * Testing message template.
    *
-   * @var \Drupal\message\MessageTypeInterface
+   * @var \Drupal\message\MessageTemplateInterface
    */
-  protected $messageType;
+  protected $messageTemplate;
 
   /**
    * The message notification service.
@@ -51,12 +51,12 @@ class MessageNotifyTest extends KernelTestBase {
     parent::setUp();
 
     $this->installEntitySchema('user');
-    $this->installEntitySchema('message_type');
+//    $this->installEntitySchema('message_template');
     $this->installEntitySchema('message');
     $this->installConfig(['message', 'message_notify', 'message_notify_test']);
     $this->installSchema('system', ['sequences']);
 
-    $this->messageType = MessageType::load('message_notify_test');
+    $this->messageTemplate = MessageTemplate::load('message_notify_test');
 
     $this->messageNotifier = $this->container->get('message_notify.sender');
   }
@@ -67,7 +67,7 @@ class MessageNotifyTest extends KernelTestBase {
    * Check the correct info is sent to delivery.
    */
   public function testDeliver() {
-    $message = Message::create(['type' => $this->messageType->id()]);
+    $message = Message::create(['template' => $this->messageTemplate->id()]);
     $message->message_text_another = 'another field';
     $this->messageNotifier->send($message, [], 'test');
 
@@ -88,12 +88,12 @@ class MessageNotifyTest extends KernelTestBase {
   public function testPostSendMessageSave() {
     $account = User::create(['name' => $this->randomMachineName()]);
     $account->save();
-    $message = Message::create(['type' => $this->messageType->id(), 'uid' => $account->id()]);
+    $message = Message::create(['template' => $this->messageTemplate->id(), 'uid' => $account->id()]);
     $message->fail = FALSE;
     $this->messageNotifier->send($message, [], 'test');
     $this->assertTrue($message->id(), 'Message saved after successful delivery.');
 
-    $message = Message::create(['type' => $this->messageType->id(), 'uid' => $account->id()]);
+    $message = Message::create(['template' => $this->messageTemplate->id(), 'uid' => $account->id()]);
     $message->fail = TRUE;
     $this->messageNotifier->send($message, [], 'test');
     $this->assertFalse($message->id(), 'Message not saved after unsuccessful delivery.');
@@ -104,13 +104,13 @@ class MessageNotifyTest extends KernelTestBase {
       'save on success' => FALSE,
     ];
 
-    $message = Message::create(['type' => $this->messageType->id(), 'uid' => $account->id()]);
+    $message = Message::create(['template' => $this->messageTemplate->id(), 'uid' => $account->id()]);
     // @todo See above.
     $message->fail = FALSE;
     $this->messageNotifier->send($message, $options, 'test');
     $this->assertTrue($message->isNew(), 'Message not saved after successful delivery.');
 
-    $message = Message::create(['type' => $this->messageType->id(), 'uid' => $account->id()]);
+    $message = Message::create(['template' => $this->messageTemplate->id(), 'uid' => $account->id()]);
     $message->fail = TRUE;
     $this->messageNotifier->send($message, $options, 'test');
     $this->assertTrue($message->isNew(), 'Message not saved after unsuccessful delivery.');
@@ -130,7 +130,7 @@ class MessageNotifyTest extends KernelTestBase {
       ],
     ];
 
-    $message = Message::create(['type' => $this->messageType->id()]);
+    $message = Message::create(['template' => $this->messageTemplate->id()]);
     $this->messageNotifier->send($message, $options, 'test');
     $this->assertTrue($message->rendered_foo->value && $message->rendered_bar->value, 'Message is rendered to fields.');
 
@@ -142,7 +142,7 @@ class MessageNotifyTest extends KernelTestBase {
       ],
     ];
 
-    $message = Message::create(['type' => $this->messageType->id()]);
+    $message = Message::create(['template' => $this->messageTemplate->id()]);
     $this->messageNotifier->send($message, $options, 'test');
     $this->assertTrue($message->rendered_baz->value && $message->rendered_bar->value, 'Message is rendered to fields with text-processing.');
 
@@ -153,7 +153,7 @@ class MessageNotifyTest extends KernelTestBase {
         // No "bar" field.
       ],
     ];
-    $message = Message::create(['type' => $this->messageType->id()]);
+    $message = Message::create(['template' => $this->messageTemplate->id()]);
     try {
       $this->messageNotifier->send($message, $options, 'test');
       $this->fail('Can save rendered message with missing view mode.');
@@ -169,7 +169,7 @@ class MessageNotifyTest extends KernelTestBase {
         'bar' => 'rendered_bar',
       ],
     ];
-    $message = Message::create(['type' => $this->messageType->id()]);
+    $message = Message::create(['template' => $this->messageTemplate->id()]);
     try {
       $this->messageNotifier->send($message, $options, 'test');
       $this->fail('Can save rendered message to non-existing field.');
@@ -200,7 +200,7 @@ class MessageNotifyTest extends KernelTestBase {
 
       $field = FieldConfig::create([
         'field_name' => $field_name,
-        'bundle' => $this->messageType->id(),
+        'bundle' => $this->messageTemplate->id(),
         'entity_type' => 'message',
         'label' => $field_name,
       ]);

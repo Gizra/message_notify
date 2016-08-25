@@ -2,6 +2,7 @@ langcode: en
 status: true
 dependencies:
   module:
+    - field
     - message
 id: message.message_text_another
 field_name: message_text_another
