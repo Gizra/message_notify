@@ -14,9 +14,9 @@ env:
     - MODULE_NAME='message_notify'
     - MODULE_TEST_GROUP='message_notify'
     - DRUPAL_REPO='git://drupalcode.org/project/drupal.git'
-    - DRUPAL_VERSION='8.0.x'
+    - DRUPAL_VERSION='8.3.x'
     - PHPCS_VERSION='2.5.*'
-    - CODER_VERSION='8.2.6'
+    - CODER_VERSION='8.2.8'
 
 # Run on modern Travis infrastructure.
 sudo: false
@@ -45,12 +45,12 @@ install:
   - mkdir /tmp/$MODULE_NAME
   - mv * /tmp/$MODULE_NAME/
   - git clone --branch $DRUPAL_VERSION $DRUPAL_REPO drupal --depth 1
+  - cd drupal && composer install && cd -
   - mv /tmp/$MODULE_NAME drupal/modules/
   - cd drupal
   # Install the message module from github
   # Use working branch until PRs are merged in main repo.
-  #- cd modules && git clone -b 8.x-1.x https://github.com/Gizra/message.git && cd -
-  - cd modules && git clone -b working https://github.com/jhedstrom/message.git && cd -
+  - cd modules && git clone -b 8.x-1.x https://github.com/Gizra/message.git && cd -
 
 before_script:
 
