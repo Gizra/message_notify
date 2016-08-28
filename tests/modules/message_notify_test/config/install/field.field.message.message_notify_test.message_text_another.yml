@@ -3,7 +3,7 @@ status: true
 dependencies:
   config:
     - field.storage.message.message_text_another
-    - message.type.message_notify_test
+    - message.template.message_notify_test
 id: message.message_notify_test.message_text_another
 field_name: message_text_another
 entity_type: message
