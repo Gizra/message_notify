@@ -79,7 +79,7 @@ abstract class MessageNotifierBase extends PluginBase implements MessageNotifier
     $output = [];
 
     $view_builder = $this->entityTypeManager->getViewBuilder('message');
-    foreach ($this->pluginDefinition['view_modes'] as $view_mode) {
+    foreach ($this->pluginDefinition['viewModes'] as $view_mode) {
       $output[$view_mode] = $view_builder->view($this->message, $view_mode);
     }
 
@@ -108,7 +108,7 @@ abstract class MessageNotifierBase extends PluginBase implements MessageNotifier
     }
 
     if (isset($this->configuration['rendered fields'])) {
-      foreach ($this->pluginDefinition['view_modes'] as $view_mode) {
+      foreach ($this->pluginDefinition['viewModes'] as $view_mode) {
         if (empty($this->configuration['rendered fields'][$view_mode])) {
           throw new MessageNotifyException('The rendered view mode "' . $view_mode . '" cannot be saved to field, as there is not a matching one.');
         }

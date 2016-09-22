@@ -21,18 +21,18 @@ class Notifier extends Plugin {
   /**
    * The human-readable title.
    *
-   * @ingroup plugin_translatable
-   *
    * @var \Drupal\Core\Annotation\Translation
+   *
+   * @ingroup plugin_translatable
    */
   public $title;
 
   /**
    * The description.
    *
-   * @ingroup plugin_translatable
-   *
    * @var \Drupal\Core\Annotation\Translation
+   *
+   * @ingroup plugin_translatable
    */
   public $description;
 
@@ -41,6 +41,6 @@ class Notifier extends Plugin {
    *
    * @var array
    */
-  public $view_modes;
+  public $viewModes;
 
 }

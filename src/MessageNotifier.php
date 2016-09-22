@@ -39,7 +39,7 @@ class MessageNotifier {
    *   Optional; The name of the notifier to use. Defaults to "email"
    *   sending method.
    *
-   * @return bool Boolean value denoting success or failure of the notification.
+   * @return bool
    *   Boolean value denoting success or failure of the notification.
    *
    * @throws \Drupal\message_notify\Exception\MessageNotifyException
