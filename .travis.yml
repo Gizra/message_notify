@@ -68,14 +68,20 @@ before_script:
 
   # Start a web server.
   - drush runserver 127.0.0.1:8080 &
-  #- until netstat -an 2>/dev/null | grep '8080.*LISTEN'; do true; done
+
+  # Export web server URL for browser tests.
+  - export SIMPLETEST_BASE_URL=http://localhost:8080
+
+  # Export database variable for kernel tests.
+  - export SIMPLETEST_DB=mysql://root:@127.0.0.1/drupal
 
 script:
   # Run code sniffer.
   - phpcs --report=full --standard=Drupal $TRAVIS_BUILD_DIR/drupal/modules/$MODULE_NAME
 
   # Run the tests
-  - php $TRAVIS_BUILD_DIR/drupal/core/scripts/run-tests.sh --verbose --color --php `which php` --url http://127.0.0.1:8080 "$MODULE_TEST_GROUP" | tee /tmp/test.txt; TEST_EXIT=${PIPESTATUS[0]}; echo $TEST_EXIT
+  - vendor/bin/phpunit -c core/phpunit.xml.dist ./modules/message_notify
+
   # Check if we had fails in the run-tests.sh script
   # Exit with the inverted value, because if there are no fails found, it will
   # exit with 1 and for us that is a good thing so invert it to 0. Travis has
