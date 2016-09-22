@@ -1,10 +1,11 @@
 <?php
 
-namespace Drupal\message_notify\Tests;
+namespace Drupal\Tests\message_notify\Functional;
 
+use Drupal\Core\Test\AssertMailTrait;
 use Drupal\message\Entity\Message;
 use Drupal\message\Entity\MessageTemplate;
-use Drupal\simpletest\WebTestBase;
+use Drupal\Tests\BrowserTestBase;
 
 /**
  * Test the email notifier plugin.
@@ -13,7 +14,9 @@ use Drupal\simpletest\WebTestBase;
  *
  * Uses web test base since that provides the mock email handler.
  */
-class EmailNotifierTest extends WebTestBase {
+class EmailNotifierTest extends BrowserTestBase {
+
+  use AssertMailTrait;
 
   /**
    * {@inheritdoc}

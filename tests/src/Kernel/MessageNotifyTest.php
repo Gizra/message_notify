@@ -1,13 +1,13 @@
 <?php
 
-namespace Drupal\message_notify\Tests;
+namespace Drupal\Tests\message_notify\Kernel;
 
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\KernelTests\KernelTestBase;
 use Drupal\message\Entity\Message;
 use Drupal\message\Entity\MessageTemplate;
 use Drupal\message_notify\Exception\MessageNotifyException;
-use Drupal\simpletest\KernelTestBase;
 use Drupal\user\Entity\User;
 
 /**
@@ -51,7 +51,6 @@ class MessageNotifyTest extends KernelTestBase {
     parent::setUp();
 
     $this->installEntitySchema('user');
-//    $this->installEntitySchema('message_template');
     $this->installEntitySchema('message');
     $this->installConfig(['message', 'message_notify', 'message_notify_test']);
     $this->installSchema('system', ['sequences']);

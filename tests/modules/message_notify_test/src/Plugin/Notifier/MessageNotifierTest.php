@@ -11,7 +11,7 @@ use Drupal\message_notify\Plugin\Notifier\MessageNotifierBase;
  *   id = "test",
  *   title = @Translation("Test notifier"),
  *   description = @Translation("A notifier plugin for tests"),
- *   view_modes = {
+ *   viewModes = {
  *     "foo",
  *     "bar"
  *   }

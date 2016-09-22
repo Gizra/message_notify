@@ -15,7 +15,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   id = "email",
  *   title = @Translation("Email"),
  *   description = @Translation("Send messages via email"),
- *   view_modes = {
+ *   viewModes = {
  *     "mail_subject",
  *     "mail_body"
  *   }
