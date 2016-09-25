@@ -76,7 +76,7 @@ class Email extends MessageNotifierBase {
     if (!$this->configuration['mail'] && !$account->id()) {
       // The message has no owner and no mail was passed. This will cause an
       // exception, we just make sure it's a clear one.
-      throw new MessageNotifyException('It is not possible to send a Message for an anonymous owner. You may set an owner using ::setOwner() or pass a "mail" to the $options array');
+      throw new MessageNotifyException('It is not possible to send a Message for an anonymous owner. You may set an owner using ::setOwner() or pass a "mail" to the $options array.');
     }
 
     $mail = $this->configuration['mail'] ?: $account->getEmail();
