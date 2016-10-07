@@ -2,6 +2,8 @@
 
 namespace Drupal\message_notify\Plugin\Notifier;
 
+use Drupal\Component\Plugin\DerivativeInspectionInterface;
+use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 
 /**
@@ -10,7 +12,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
  * Implementations that wish to provide an implementation of this should
  * register it using CTools' plugin system.
  */
-interface MessageNotifierInterface extends ContainerFactoryPluginInterface {
+interface MessageNotifierInterface extends ContainerFactoryPluginInterface, PluginInspectionInterface, DerivativeInspectionInterface {
 
   /**
    * Entry point to send and process a message.
