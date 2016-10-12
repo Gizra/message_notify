@@ -6,6 +6,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Mail\MailManagerInterface;
 use Drupal\message\MessageInterface;
+use Drupal\message_notify\Exception\MessageNotifyException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -71,6 +72,13 @@ class Email extends MessageNotifierBase {
   public function deliver(array $output = []) {
     /** @var \Drupal\user\UserInterface $account */
     $account = $this->message->uid->entity;
+
+    if (!$this->configuration['mail'] && !$account->id()) {
+      // The message has no owner and no mail was passed. This will cause an
+      // exception, we just make sure it's a clear one.
+      throw new MessageNotifyException('It is not possible to send a Message for an anonymous owner. You may set an owner using ::setOwner() or pass a "mail" to the $options array.');
+    }
+
     $mail = $this->configuration['mail'] ?: $account->getEmail();
 
     if (!$this->configuration['language override']) {
