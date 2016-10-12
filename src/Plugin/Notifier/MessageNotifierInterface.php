@@ -5,6 +5,7 @@ namespace Drupal\message_notify\Plugin\Notifier;
 use Drupal\Component\Plugin\DerivativeInspectionInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\message\MessageInterface;
 
 /**
  * Additional behaviors for a Entity Reference field.
@@ -48,5 +49,13 @@ interface MessageNotifierInterface extends ContainerFactoryPluginInterface, Plug
    * Determine if user can access notifier.
    */
   public function access();
+
+  /**
+   * Set the message object for the notifier.
+   *
+   * @param \Drupal\message\MessageInterface $message
+   *   The message object.
+   */
+  public function setMessage(MessageInterface $message);
 
 }
