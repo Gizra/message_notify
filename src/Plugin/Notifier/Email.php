@@ -39,7 +39,7 @@ class Email extends MessageNotifierBase {
    * @param \Drupal\Core\Mail\MailManagerInterface $mail_manager
    *   The mail manager service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, LoggerChannelInterface $logger, EntityTypeManagerInterface $entity_type_manager, MessageInterface $message, MailManagerInterface $mail_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, LoggerChannelInterface $logger, EntityTypeManagerInterface $entity_type_manager, MessageInterface $message = NULL, MailManagerInterface $mail_manager) {
     // Set configuration defaults.
     $configuration += [
       'mail' => FALSE,
@@ -71,7 +71,7 @@ class Email extends MessageNotifierBase {
    */
   public function deliver(array $output = []) {
     /** @var \Drupal\user\UserInterface $account */
-    $account = $this->message->uid->entity;
+    $account = $this->message->getOwner();
 
     if (!$this->configuration['mail'] && !$account->id()) {
       // The message has no owner and no mail was passed. This will cause an

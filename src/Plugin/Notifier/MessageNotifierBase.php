@@ -43,9 +43,11 @@ abstract class MessageNotifierBase extends PluginBase implements MessageNotifier
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
    * @param \Drupal\message\MessageInterface $message
-   *   The message entity.
+   *   (optional) The message entity. This is required when sending or
+   *   delivering a notification. If not passed to the constructor, use
+   *   ::setMessage().
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, LoggerChannelInterface $logger, EntityTypeManagerInterface $entity_type_manager, MessageInterface $message) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, LoggerChannelInterface $logger, EntityTypeManagerInterface $entity_type_manager, MessageInterface $message = NULL) {
     // Set some defaults.
     $configuration += [
       'save on success' => TRUE,
@@ -76,6 +78,8 @@ abstract class MessageNotifierBase extends PluginBase implements MessageNotifier
    * {@inheritdoc}
    */
   public function send() {
+    assert('isset($this->message)', 'No message is set for this notifier.');
+
     $output = [];
 
     $view_builder = $this->entityTypeManager->getViewBuilder('message');
@@ -98,7 +102,7 @@ abstract class MessageNotifierBase extends PluginBase implements MessageNotifier
   public function postSend($result, array $output = []) {
     $save = FALSE;
     if (!$result) {
-      $this->logger->error('Could not send message using {title} to user ID {uid}.', ['{title}' => $this->pluginDefinition['title'], '{uid}' => $this->message->uid->entity->id()]);
+      $this->logger->error('Could not send message using {title} to user ID {uid}.', ['{title}' => $this->pluginDefinition['title'], '{uid}' => $this->message->getOwnerId()]);
       if ($this->configuration['save on fail']) {
         $save = TRUE;
       }
@@ -142,6 +146,13 @@ abstract class MessageNotifierBase extends PluginBase implements MessageNotifier
    */
   public function access() {
     return TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function setMessage(MessageInterface $message) {
+    $this->message = $message;
   }
 
 }
