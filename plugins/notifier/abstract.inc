@@ -146,6 +146,14 @@ abstract class MessageNotifierBase implements MessageNotifierInterface {
         continue;
       }
 
+      if (!in_array($this->message->type, $field['bundles']['message'])) {
+        $this->handleError('Field @field is not part of @bundle message type.', array(
+          '@field' => $field_name,
+          '@bundle' => $this->message->type,
+        ));
+        continue;
+      }
+
       // Get the format from the field. We assume the first delta is the
       // same as the rest.
       if (empty($wrapper->{$field_name}->format)) {
