@@ -70,13 +70,29 @@ abstract class MessageNotifierBase implements MessageNotifierInterface {
     $this->message = $message;
   }
 
-  public function send() {
-    $message = $this->message;
+  /**
+   * Renders the view modes needed for the plug-in.
+   *
+   * @return array
+   *   view_mode => rendered output for it.
+   */
+  protected function render() {
     $output = array();
-    foreach ($this->plugin['view_modes'] as $view_mode => $value) {
-      $content = $message->buildContent($view_mode);
+    foreach (array_keys($this->plugin['view_modes']) as $view_mode) {
+      $content = $this->message->buildContent($view_mode);
       $output[$view_mode] = render($content);
     }
+    return $output;
+  }
+
+  /**
+   * Sending the message as a notification on the givven channel.
+   *
+   * @return bool
+   *   Delivery status result. TRUE on success.
+   */
+  public function send() {
+    $output = $this->render();
     $result = $this->deliver($output);
     $this->postSend($result, $output);
     return $result;
