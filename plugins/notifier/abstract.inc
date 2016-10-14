@@ -171,7 +171,7 @@ abstract class MessageNotifierBase implements MessageNotifierInterface {
   protected function shouldSave($result) {
     $save = FALSE;
     if (!$result) {
-      watchdog('message_notify', t('Could not send message using @title to user ID @uid.'), array(
+      watchdog('message_notify', 'Could not send message using @title to user ID @uid.', array(
         '@title' => $this->plugin['title'],
         '@uid' => $this->message->uid,
       ), WATCHDOG_ERROR);
