@@ -21,7 +21,7 @@ class EmailNotifierTest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  public static $modules = ['text', 'message_notify_test'];
+  public static $modules = ['text', 'message_notify_test', 'filter_test'];
 
   /**
    * Testing message template.
