@@ -42,6 +42,8 @@ class MessageNotifyTest extends KernelTestBase {
     'system',
     'field',
     'text',
+    'filter',
+    'filter_test',
   ];
 
   /**
@@ -52,7 +54,12 @@ class MessageNotifyTest extends KernelTestBase {
 
     $this->installEntitySchema('user');
     $this->installEntitySchema('message');
-    $this->installConfig(['message', 'message_notify', 'message_notify_test']);
+    $this->installConfig([
+      'message',
+      'message_notify',
+      'message_notify_test',
+      'filter_test',
+    ]);
     $this->installSchema('system', ['sequences']);
 
     $this->messageTemplate = MessageTemplate::load('message_notify_test');
