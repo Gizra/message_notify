@@ -13,6 +13,6 @@ class MessageNotifierSlack extends MessageNotifierBase {
       throw new MessageNotifyException('Message cannot be sent if Webhook URL is not configured in Slack module settings.');
     }
 
-    return slack_send_message($webhook_url, $output['message_notify_slack_body']);
+    return slack_send_message($webhook_url, strip_tags($output['message_notify_slack_body']));
   }
 }
