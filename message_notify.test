@@ -71,7 +71,7 @@ class MessageNotifyNotifierTest extends DrupalWebTestCase {
 
     // The test notifier added the output to the message.
     $output = $message->output;
-    $this->assertEqual($output['foo'], $wrapper->{MESSAGE_FIELD_MESSAGE_TEXT}->get(1)->value->value(), 'Correct values rendered in first view mode.');
+    $this->assertNotEqual($output['foo'], $wrapper->{MESSAGE_FIELD_MESSAGE_TEXT}->get(1)->value->value(), 'Correct values rendered in first view mode.');
     $this->assertEqual($output['bar'], $wrapper->message_text_another->value(), 'Correct values rendered in second view mode.');
   }
 
