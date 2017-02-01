@@ -49,6 +49,7 @@ function message_notify_resend($min_mid, $max_mid) {
 
   $sent_count = 0;
   foreach (message_load_multiple(array_keys($result['message'])) as $message) {
+    // Send the message.
     if (message_notify_send_message($message, array(), $notifier)) {
       drush_log(dt('Message #@mid resent.', array('@mid' => $message->mid)), 'success');
       $sent_count++;
