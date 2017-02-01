@@ -13,16 +13,16 @@ function message_notify_drush_command() {
 
   $items['message-resend'] = array(
     'callback' => 'message_notify_resend',
-    'description' => 'Resend selected messages by minimal and maximal message IDs.',
+    'description' => dt('Resend selected messages by minimal and maximal message IDs.'),
     'arguments' => array(
-      'min_mid' => 'Message ID to start from.',
-      'max_mid' => 'Maximal message ID to resend.',
+      'min_mid' => dt('Message ID to start from.'),
+      'max_mid' => dt('Maximal message ID to resend.'),
     ),
     'options' => array(
-      'notifier' => "The notifier to use. 'email' by default.",
+      'notifier' => dt('The notifier to use. \'email\' by default.'),
     ),
     'examples' => array(
-      'drush message-resend 120 140' => 'Resend messages with ID between 120 and 140.',
+      'drush message-resend 120 140' => dt('Resend messages with ID between 120 and 140.'),
     ),
   );
 
