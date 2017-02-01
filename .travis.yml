@@ -23,7 +23,7 @@ before_script:
 
   # install drupal
   - mysql -e 'create database drupal'
-  - drush core-quick-drupal --yes --core=drupal-7 --profile=testing --no-server --db-url=mysql://root:@127.0.0.1/drupal --enable=simpletest message_notify
+  - drush core-quick-drupal --yes --core=drupal-7 --profile=testing --no-server --db-url=mysql://root:@127.0.0.1/drupal --enable=simpletest message_notify || true
 
   # reference and enable module in build site
   - ln -s $(readlink -e $(cd -)) message_notify/drupal/sites/all/modules/message_notify
