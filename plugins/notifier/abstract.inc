@@ -56,12 +56,12 @@ interface MessageNotifierInterface {
 abstract class MessageNotifierBase implements MessageNotifierInterface {
 
   /**
-   * The plugin definition.
+   * @var array The plugin definition.
    */
   protected $plugin;
 
   /**
-   * The message entity.
+   * @var Message The message entity.
    */
   protected $message;
 
@@ -70,13 +70,29 @@ abstract class MessageNotifierBase implements MessageNotifierInterface {
     $this->message = $message;
   }
 
-  public function send() {
-    $message = $this->message;
+  /**
+   * Renders the view modes needed for the plug-in.
+   *
+   * @return array
+   *   view_mode => rendered output for it.
+   */
+  protected function render() {
     $output = array();
-    foreach ($this->plugin['view_modes'] as $view_mode => $value) {
-      $content = $message->buildContent($view_mode);
+    foreach (array_keys($this->plugin['view_modes']) as $view_mode) {
+      $content = $this->message->buildContent($view_mode);
       $output[$view_mode] = render($content);
     }
+    return $output;
+  }
+
+  /**
+   * Sending the message as a notification on the givven channel.
+   *
+   * @return bool
+   *   Delivery status result. TRUE on success.
+   */
+  public function send() {
+    $output = $this->render();
     $result = $this->deliver($output);
     $this->postSend($result, $output);
     return $result;
@@ -91,50 +107,108 @@ abstract class MessageNotifierBase implements MessageNotifierInterface {
    * - Invoke watchdog error on failure.
    */
   public function postSend($result, array $output = array()) {
-    $plugin = $this->plugin;
-    $message = $this->message;
+    if (($save = $this->shouldSave($result))) {
+      $this->handleRenderedFields($output);
+      $this->message->save();
+    }
+    return $save;
+  }
 
-    $options = $plugin['options'];
+  /**
+   * Handles the assignment of rendered output to fields on the message.
+   *
+   * Configuration is taken from plugin['options']['rendered fields'] list.
+   *
+   * @param array $output
+   *   Mapping of the view_mode -> rendered result, collected after delivery.
+   */
+  protected function handleRenderedFields($output) {
+    if (empty($this->plugin['options']['rendered fields'])) {
+      // Bail early, when nothing is configured.
+      return;
+    }
 
+    // Save the rendered output into matching fields.
+    $wrapper = entity_metadata_wrapper('message', $this->message);
+    foreach ($this->plugin['view_modes'] as $view_mode => $mode) {
+      if (empty($this->plugin['options']['rendered fields'][$view_mode])) {
+        $this->handleError('The rendered view mode @mode cannot be saved to field, as there is not a matching one.', array(
+          '@mode' => $mode['label'],
+        ));
+        continue;
+      }
+      $field_name = $this->plugin['options']['rendered fields'][$view_mode];
+
+      if (!$field = field_info_field($field_name)) {
+        $this->handleError('Field @field does not exist.', array(
+          '@field' => $field_name,
+        ));
+        continue;
+      }
+
+      if (!in_array($this->message->type, $field['bundles']['message'])) {
+        $this->handleError('Field @field is not part of @bundle message type.', array(
+          '@field' => $field_name,
+          '@bundle' => $this->message->type,
+        ));
+        continue;
+      }
+
+      // Get the format from the field. We assume the first delta is the
+      // same as the rest.
+      if (empty($wrapper->{$field_name}->format)) {
+        $wrapper->{$field_name}->set($output[$view_mode]);
+      }
+      else {
+        $format = $wrapper->type->{MESSAGE_FIELD_MESSAGE_TEXT}->get(0)->format->value();
+        $wrapper->{$field_name}->set(array('value' => $output[$view_mode], 'format' => $format));
+      }
+    }
+  }
+
+  /**
+   * Utility to throw exceptions.
+   *
+   * Exposed like this, to allow silencnig them from ancestors.
+   *
+   * @param string $error_text
+   *   Error message.
+   * @param array $variables
+   *   List of variables to interpolate in $error_text.
+   *
+   * @throws MessageNotifyException
+   *   Always
+   */
+  protected function handleError($error_text, array $variables = array()) {
+    throw new MessageNotifyException(format_string($error_text, $variables));
+  }
+
+  /**
+   * Utility to decide, whether to save the incomming message or not.
+   *
+   * @param bool $result
+   *   Delivery function's result value.
+   *
+   * @return bool
+   *   When TRUE, the messages should be saved to DB.
+   */
+  protected function shouldSave($result) {
     $save = FALSE;
     if (!$result) {
-      watchdog('message_notify', t('Could not send message using @title to user ID @uid.'), array('@title' => $plugin['title'], '@uid' => $message->uid), WATCHDOG_ERROR);
-      if ($options['save on fail']) {
+      watchdog('message_notify', 'Could not send message using @title to user ID @uid.', array(
+        '@title' => $this->plugin['title'],
+        '@uid' => $this->message->uid,
+      ), WATCHDOG_ERROR);
+
+      if ($this->plugin['options']['save on fail']) {
         $save = TRUE;
       }
     }
-    elseif ($result && $options['save on success']) {
+    elseif ($result && $this->plugin['options']['save on success']) {
       $save = TRUE;
     }
 
-    if ($options['rendered fields']) {
-      // Save the rendered output into matching fields.
-      $wrapper = entity_metadata_wrapper('message', $message);
-      foreach ($this->plugin['view_modes'] as $view_mode => $mode) {
-        if (empty($options['rendered fields'][$view_mode])) {
-          throw new MessageNotifyException(format_string('The rendered view mode @mode cannot be saved to field, as there is not a matching one.', array('@mode' => $mode['label'])));
-        }
-        $field_name = $options['rendered fields'][$view_mode];
-
-        if (!$field = field_info_field($field_name)) {
-          throw new MessageNotifyException(format_string('Field @field does not exist.', array('@field' => $field_name)));
-        }
-
-        // Get the format from the field. We assume the first delta is the
-        // same as the rest.
-        if (empty($wrapper->{$field_name}->format)) {
-          $wrapper->{$field_name}->set($output[$view_mode]);
-        }
-        else {
-          $format = $wrapper->type->{MESSAGE_FIELD_MESSAGE_TEXT}->get(0)->format->value();
-          $wrapper->{$field_name}->set(array('value' => $output[$view_mode], 'format' => $format));
-        }
-      }
-    }
-
-    if ($save) {
-      $message->save();
-    }
+    return $save;
   }
 
   public function access() {
