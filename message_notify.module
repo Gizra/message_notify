@@ -32,6 +32,11 @@ function message_notify_entity_bundle_create($entity_type_id, $bundle) {
     return;
   }
 
+  // If this bundle is being created from a .yml file, ignore.
+  if (\Drupal::isConfigSyncing()) {
+    return;
+  }
+
   $storage = \Drupal::entityTypeManager()->getStorage('entity_view_display');
   /** @var \Drupal\Core\Entity\Display\EntityViewDisplayInterface $default */
   $default = entity_get_display($entity_type_id, $bundle, 'default');
