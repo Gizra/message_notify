@@ -7,6 +7,7 @@ use Drupal\Core\Entity\EntityViewBuilderInterface;
 use Drupal\Core\Language\Language;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Mail\MailManagerInterface;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\message\MessageInterface;
 use Drupal\message\MessageTemplateInterface;
 use Drupal\message_notify\Plugin\Notifier\Email;
@@ -44,6 +45,13 @@ class EmailTest extends UnitTestCase {
   protected $mailManager;
 
   /**
+   * The rendering service.
+   *
+   * @var \Drupal\Core\Render\RendererInterface
+   */
+  protected $renderer;
+
+  /**
    * Plugin definition.
    *
    * @var array
@@ -70,6 +78,7 @@ class EmailTest extends UnitTestCase {
 
     $this->entityTypeManager = $this->prophesize(EntityTypeManagerInterface::class)->reveal();
     $this->mailManager = $this->prophesize(MailManagerInterface::class)->reveal();
+    $this->renderer = $this->prophesize(RendererInterface::class)->reveal();
     $this->pluginId = $this->randomMachineName();
     $this->pluginDefinition['title'] = $this->randomMachineName();
   }
@@ -150,6 +159,7 @@ class EmailTest extends UnitTestCase {
       $this->pluginDefinition,
       $logger,
       $this->entityTypeManager,
+      $this->renderer,
       $message,
       $this->mailManager
     );

@@ -5,6 +5,7 @@ namespace Drupal\message_notify\Plugin\Notifier;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Mail\MailManagerInterface;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\message\MessageInterface;
 use Drupal\message_notify\Exception\MessageNotifyException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -39,14 +40,14 @@ class Email extends MessageNotifierBase {
    * @param \Drupal\Core\Mail\MailManagerInterface $mail_manager
    *   The mail manager service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, LoggerChannelInterface $logger, EntityTypeManagerInterface $entity_type_manager, MessageInterface $message = NULL, MailManagerInterface $mail_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, LoggerChannelInterface $logger, EntityTypeManagerInterface $entity_type_manager, RendererInterface $render, MessageInterface $message = NULL, MailManagerInterface $mail_manager) {
     // Set configuration defaults.
     $configuration += [
       'mail' => FALSE,
       'language override' => FALSE,
     ];
 
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $logger, $entity_type_manager, $message);
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $logger, $entity_type_manager, $render, $message);
 
     $this->mailManager = $mail_manager;
   }
@@ -61,6 +62,7 @@ class Email extends MessageNotifierBase {
       $plugin_definition,
       $container->get('logger.channel.message_notify'),
       $container->get('entity_type.manager'),
+      $container->get('renderer'),
       $message,
       $container->get('plugin.manager.mail')
     );
@@ -89,9 +91,8 @@ class Email extends MessageNotifierBase {
     }
 
     // The subject in an email can't be with HTML, so strip it.
-    // @todo Centralize rendering.
-    $output['mail_subject'] = strip_tags($output['mail_subject']['#markup']);
-    $output['mail_body'] = $output['mail_body']['#markup'];
+    $output['mail_subject'] = trim(strip_tags($output['mail_subject']));
+    $output['mail_body'] = $output['mail_body'];
 
     // Pass the message entity along to hook_drupal_mail().
     $output['message_entity'] = $this->message;
