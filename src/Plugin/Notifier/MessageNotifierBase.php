@@ -5,6 +5,7 @@ namespace Drupal\message_notify\Plugin\Notifier;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Logger\LoggerChannelInterface;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\message\MessageInterface;
 use Drupal\message_notify\Exception\MessageNotifyException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -36,18 +37,27 @@ abstract class MessageNotifierBase extends PluginBase implements MessageNotifier
   protected $entityTypeManager;
 
   /**
+   * The rendering service.
+   *
+   * @var \Drupal\Core\Render\RendererInterface
+   */
+  protected $renderer;
+
+  /**
    * {@inheritdoc}
    *
    * @param \Drupal\Core\Logger\LoggerChannelInterface $logger
    *   The message_notify logger channel.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    *   The entity type manager service.
+   * @param \Drupal\Core\Render\RendererInterface $renderer
+   *   The rendering service.
    * @param \Drupal\message\MessageInterface $message
    *   (optional) The message entity. This is required when sending or
    *   delivering a notification. If not passed to the constructor, use
    *   ::setMessage().
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, LoggerChannelInterface $logger, EntityTypeManagerInterface $entity_type_manager, MessageInterface $message = NULL) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, LoggerChannelInterface $logger, EntityTypeManagerInterface $entity_type_manager, RendererInterface $renderer, MessageInterface $message = NULL) {
     // Set some defaults.
     $configuration += [
       'save on success' => TRUE,
@@ -58,6 +68,7 @@ abstract class MessageNotifierBase extends PluginBase implements MessageNotifier
     $this->logger = $logger;
     $this->entityTypeManager = $entity_type_manager;
     $this->message = $message;
+    $this->renderer = $renderer;
   }
 
   /**
@@ -70,6 +81,7 @@ abstract class MessageNotifierBase extends PluginBase implements MessageNotifier
       $plugin_definition,
       $container->get('logger.channel.message_notify'),
       $container->get('entity_type.manager'),
+      $container->get('renderer'),
       $message
     );
   }
@@ -84,7 +96,8 @@ abstract class MessageNotifierBase extends PluginBase implements MessageNotifier
 
     $view_builder = $this->entityTypeManager->getViewBuilder('message');
     foreach ($this->pluginDefinition['viewModes'] as $view_mode) {
-      $output[$view_mode] = $view_builder->view($this->message, $view_mode);
+      $build = $view_builder->view($this->message, $view_mode);
+      $output[$view_mode] = $this->renderer->renderPlain($build);
     }
 
     $result = $this->deliver($output);
@@ -128,7 +141,7 @@ abstract class MessageNotifierBase extends PluginBase implements MessageNotifier
         if (!$format = $this->message->get($field_name)->format) {
           // Field has no formatting.
           // @todo Centralize/unify rendering.
-          $this->message->set($field_name, $output[$view_mode]['#markup']);
+          $this->message->set($field_name, $output[$view_mode]);
         }
         else {
           $this->message->set($field_name, ['value' => $output[$view_mode], 'format' => $format]);

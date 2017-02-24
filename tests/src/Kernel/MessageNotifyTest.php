@@ -79,13 +79,11 @@ class MessageNotifyTest extends KernelTestBase {
 
     // The test notifier added the output to the message.
     $output = $message->output;
-
     $text = $message->getText();
-    // @todo Should this be rendered in the notifier plugin?
-    $this->assertTrue(isset($output['foo']['message_text_another']));
-    $this->assertEqual($text[1], $output['foo']['#markup']);
-    $this->assertFalse(isset($output['bar']['message_text_another']));
-    $this->assertEqual($text[0], $output['bar']['#markup']);
+    $this->assertContains((string) $text[1], (string) $output['foo']);
+    $this->assertContains('another field', (string) $output['foo']);
+    $this->assertContains((string) $text[0], (string) $output['bar']);
+    $this->assertNotContains('another field', (string) $output['bar']);
   }
 
   /**
