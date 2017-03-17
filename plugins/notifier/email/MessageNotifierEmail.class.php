@@ -13,6 +13,7 @@ class MessageNotifierEmail extends MessageNotifierBase {
 
     $account = user_load($message->uid);
     $mail = $options['mail'] ? $options['mail'] : $account->mail;
+    $from = $options['from'] ? $options['from'] : NULL;
 
     $languages = language_list();
     if (!$options['language override']) {
@@ -28,7 +29,7 @@ class MessageNotifierEmail extends MessageNotifierBase {
     // Pass the message entity along to hook_drupal_mail().
     $output['message_entity'] = $message;
 
-    $result =  drupal_mail('message_notify', $message->type, $mail, $lang, $output);
+    $result = drupal_mail('message_notify', $message->type, $mail, $lang, $output, $from);
     return $result['result'];
   }
 
