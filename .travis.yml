@@ -1,13 +1,9 @@
 language: php
 
 php:
-  - 5.5
   - 5.6
   - 7.0
-
-matrix:
-  allow_failures:
-    - php: 7.0
+  - 7.1
 
 env:
   global:
@@ -16,7 +12,7 @@ env:
     - DRUPAL_REPO='git://drupalcode.org/project/drupal.git'
     - DRUPAL_VERSION='8.3.x'
     - PHPCS_VERSION='2.7.*'
-    - CODER_VERSION='8.2.9'
+    - CODER_VERSION='^8.2'
 
 # Run on modern Travis infrastructure.
 sudo: false

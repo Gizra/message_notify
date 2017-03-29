@@ -35,8 +35,22 @@ class Email extends MessageNotifierBase {
   /**
    * Constructs the email notifier plugin.
    *
-   * {@inheritdoc}
-   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\Core\Logger\LoggerChannelInterface $logger
+   *   The message_notify logger channel.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager service.
+   * @param \Drupal\Core\Render\RendererInterface $render
+   *   The rendering service.
+   * @param \Drupal\message\MessageInterface $message
+   *   (optional) The message entity. This is required when sending or
+   *   delivering a notification. If not passed to the constructor, use
+   *   ::setMessage().
    * @param \Drupal\Core\Mail\MailManagerInterface $mail_manager
    *   The mail manager service.
    */

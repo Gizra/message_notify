@@ -44,8 +44,14 @@ abstract class MessageNotifierBase extends PluginBase implements MessageNotifier
   protected $renderer;
 
   /**
-   * {@inheritdoc}
+   * Constructs the plugin.
    *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
    * @param \Drupal\Core\Logger\LoggerChannelInterface $logger
    *   The message_notify logger channel.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
