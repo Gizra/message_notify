@@ -5,7 +5,6 @@ namespace Drupal\message_notify\Plugin\Notifier;
 use Drupal\message_notify\Exception\MessageNotifyException;
 
 /**
- * @file
  * SMS notifier.
  *
  * @todo Add plugin definition.
@@ -15,7 +14,7 @@ class Sms extends MessageNotifierBase {
   /**
    * {@inheritdoc}
    */
-  public function deliver(array $output = array()) {
+  public function deliver(array $output = []) {
     throw new MessageNotifyException('This functionality depends on the SMS Framework module. See: https://www.drupal.org/node/2582937');
     if (empty($this->message->smsNumber)) {
       // Try to get the SMS number from the account.

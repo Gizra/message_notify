@@ -33,7 +33,7 @@ interface MessageNotifierInterface extends ContainerFactoryPluginInterface, Plug
    * @return bool
    *   TRUE or FALSE based on delivery status.
    */
-  public function deliver(array $output = array());
+  public function deliver(array $output = []);
 
   /**
    * Act upon send result.
@@ -43,7 +43,7 @@ interface MessageNotifierInterface extends ContainerFactoryPluginInterface, Plug
    * @param array $output
    *   The message output array.
    */
-  public function postSend($result, array $output = array());
+  public function postSend($result, array $output = []);
 
   /**
    * Determine if user can access notifier.
