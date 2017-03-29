@@ -6,11 +6,13 @@ php:
   - 7.1
 
 env:
+  matrix:
+    - DRUPAL_VERSION=8.3.x
+    - DRUPAL_VERSION=8.4.x
   global:
     - MODULE_NAME='message_notify'
     - MODULE_TEST_GROUP='message_notify'
     - DRUPAL_REPO='git://drupalcode.org/project/drupal.git'
-    - DRUPAL_VERSION='8.3.x'
     - PHPCS_VERSION='2.7.*'
     - CODER_VERSION='^8.2'
 
