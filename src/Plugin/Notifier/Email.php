@@ -51,10 +51,10 @@ class Email extends MessageNotifierBase {
    *   (optional) The message entity. This is required when sending or
    *   delivering a notification. If not passed to the constructor, use
    *   ::setMessage().
-   * @param \Drupal\Core\Mail\MailManagerInterface $mail_manager
+   * @param \Drupal\Core\Mail\MailManagerInterface $phone_number_provider
    *   The mail manager service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, LoggerChannelInterface $logger, EntityTypeManagerInterface $entity_type_manager, RendererInterface $render, MessageInterface $message = NULL, MailManagerInterface $mail_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, LoggerChannelInterface $logger, EntityTypeManagerInterface $entity_type_manager, RendererInterface $render, MessageInterface $message = NULL, MailManagerInterface $phone_number_provider) {
     // Set configuration defaults.
     $configuration += [
       'mail' => FALSE,
@@ -63,7 +63,7 @@ class Email extends MessageNotifierBase {
 
     parent::__construct($configuration, $plugin_id, $plugin_definition, $logger, $entity_type_manager, $render, $message);
 
-    $this->mailManager = $mail_manager;
+    $this->mailManager = $phone_number_provider;
   }
 
   /**
