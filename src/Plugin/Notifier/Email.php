@@ -106,7 +106,6 @@ class Email extends MessageNotifierBase {
 
     // The subject in an email can't be with HTML, so strip it.
     $output['mail_subject'] = trim(strip_tags($output['mail_subject']));
-    $output['mail_body'] = $output['mail_body'];
 
     // Pass the message entity along to hook_drupal_mail().
     $output['message_entity'] = $this->message;
