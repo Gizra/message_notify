@@ -131,7 +131,7 @@ class EmailTest extends UnitTestCase {
    * @covers ::deliver
    *
    * @expectedException \Drupal\message_notify\Exception\MessageNotifyException
-   * @expectedExceptionMessage It is not possible to send a Message for an anonymous owner. You may set an owner using ::setOwner() or pass a "mail" to the $options array.
+   * @expectedExceptionMessage It is not possible to send a Message to an anonymous owner. You may set an owner using ::setOwner() or pass a "mail" to the $options array.
    */
   public function testSendNoEmail() {
     $message = $this->prophesize(MessageInterface::class);
