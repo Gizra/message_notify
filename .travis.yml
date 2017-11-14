@@ -7,8 +7,8 @@ php:
 
 env:
   matrix:
-    - DRUPAL_VERSION=8.3.x
     - DRUPAL_VERSION=8.4.x
+    - DRUPAL_VERSION=8.5.x
   global:
     - MODULE_NAME='message_notify'
     - MODULE_TEST_GROUP='message_notify'
