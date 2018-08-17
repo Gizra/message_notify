@@ -1,4 +1,4 @@
-name: 'Message notify'
+name: 'Message Notify'
 description: 'Message notify.'
 core: 8.x
 package: Message
