@@ -7,8 +7,8 @@ php:
 
 env:
   matrix:
-    - DRUPAL_VERSION=8.4.x
     - DRUPAL_VERSION=8.5.x
+    - DRUPAL_VERSION=8.6.x
   global:
     - MODULE_NAME='message_notify'
     - MODULE_TEST_GROUP='message_notify'
@@ -44,6 +44,7 @@ install:
   - mv * /tmp/$MODULE_NAME/
   - git clone --branch $DRUPAL_VERSION $DRUPAL_REPO drupal --depth 1
   - cd drupal && composer install && cd -
+  - test ${DRUPAL_VERSION} -eq 8.5.x || (cd drupal && composer run-script drupal-phpunit-upgrade && cd -)
   - mv /tmp/$MODULE_NAME drupal/modules/
   - cd drupal
   # Install the message module from github
