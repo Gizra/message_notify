@@ -96,7 +96,8 @@ abstract class MessageNotifierBase extends PluginBase implements MessageNotifier
    * {@inheritdoc}
    */
   public function send() {
-    assert('isset($this->message)', 'No message is set for this notifier.');
+    $has_message = isset($this->message);
+    assert($has_message, 'No message is set for this notifier.');
 
     $output = [];
 
