@@ -4,24 +4,27 @@ php:
   - 5.6
   - 7.0
   - 7.1
+  - 7.2
 
 env:
   matrix:
-    - DRUPAL_VERSION=8.5.x
     - DRUPAL_VERSION=8.6.x
+    - DRUPAL_VERSION=8.7.x
   global:
     - MODULE_NAME='message_notify'
     - MODULE_TEST_GROUP='message_notify'
     - DRUPAL_REPO='git://drupalcode.org/project/drupal.git'
     - PHPCS_VERSION='2.7.*'
     - CODER_VERSION='^8.2'
+    # Disable strict deprecation failures but show warnings.
+    - SYMFONY_DEPRECATIONS_HELPER='weak'
 
 # Run on modern Travis infrastructure.
 sudo: false
 
 before_install:
   # Composer.
-  - sed -i '1i export PATH="$HOME/.composer/vendor/bin:$PATH"' $HOME/.bashrc
+  - sed -i '1i export PATH="$HOME/.config/composer/vendor/bin:$PATH"' $HOME/.bashrc
   - source $HOME/.bashrc
   # - composer self-update
 
@@ -33,7 +36,7 @@ before_install:
 
   # Coder.
   - composer global require drupal/coder:$CODER_VERSION
-  - ln -s ~/.composer/vendor/drupal/coder/coder_sniffer/Drupal ~/.composer/vendor/squizlabs/php_codesniffer/CodeSniffer/Standards/
+  - ln -s ~/.config/composer/vendor/drupal/coder/coder_sniffer/Drupal ~/.config/composer/vendor/squizlabs/php_codesniffer/CodeSniffer/Standards/
 
   # Ensure the PHP environment is ready.
   - phpenv rehash
