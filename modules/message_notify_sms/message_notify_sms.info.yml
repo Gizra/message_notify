@@ -1,0 +1,8 @@
+name: 'Message Notify SMS'
+type: module
+package: Message
+description: 'Plugin for Message Notify to send SMS notifications.'
+core: 8.x
+dependencies:
+  - message_notify
+  - sms
