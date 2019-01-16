@@ -50,6 +50,8 @@ install:
   - test ${DRUPAL_VERSION} -eq 8.5.x || (cd drupal && composer run-script drupal-phpunit-upgrade && cd -)
   - mv /tmp/$MODULE_NAME drupal/modules/
   - cd drupal
+  - composer require drupal/sms
+  - composer require drupal/dynamic_entity_reference
   # Install the message module from github
   # Use working branch until PRs are merged in main repo.
   - cd modules && git clone -b 8.x-1.x https://github.com/Gizra/message.git && cd -
