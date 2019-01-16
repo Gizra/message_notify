@@ -1,0 +1,19 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.message.sms_message
+    - field.field.message.message_notify_sms_test.message_notify_sms_test_text
+    - message.template.message_notify_sms_test
+id: message.message_notify_sms_test.sms_message
+targetEntityType: message
+bundle: message_notify_sms_test
+mode: sms_message
+content:
+  message_notify_sms_test_text:
+    weight: -10
+    settings: { }
+    third_party_settings: { }
+    label: hidden
+hidden:
+  partial_0: true

@@ -1,0 +1,8 @@
+name: 'Message Notify SMS Test'
+description: 'Installs assisting config for testing message_notify_sms'
+type: module
+core: 8.x
+dependencies:
+  - field
+  - message_notify_sms
+package: Testing
