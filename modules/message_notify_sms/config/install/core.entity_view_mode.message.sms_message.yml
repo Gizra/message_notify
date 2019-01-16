@@ -1,0 +1,9 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - message
+id: message.sms_message
+label: 'Notify - SMS message'
+targetEntityType: message
+cache: true
