@@ -1,0 +1,16 @@
+langcode: en
+status: true
+dependencies: {  }
+template: message_notify_sms_test
+label: 'Message Notify SMS Test'
+description: 'Message template for testing purposes.'
+text:
+  -
+    value: "<p>Partial</p>"
+    format: basic_html
+settings:
+  'token options':
+    clear: false
+    'token replace': true
+  purge_override: false
+  purge_methods: {  }
