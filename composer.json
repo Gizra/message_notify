@@ -10,7 +10,10 @@
         "source": "https://cgit.drupalcode.org/message_notify"
     },
     "require": {
-      "drupal/message": "~8.1.0"
+        "drupal/message": "~8.1.0"
+    },
+    "suggest": {
+        "drupal/sms": "Allow message_notify_sms to send SMS."
     },
     "minimum-stability": "dev"
 }
