@@ -56,10 +56,7 @@ class Email extends MessageNotifierBase {
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, LoggerChannelInterface $logger, EntityTypeManagerInterface $entity_type_manager, RendererInterface $render, MessageInterface $message = NULL, MailManagerInterface $mail_manager) {
     // Set configuration defaults.
-    $configuration += [
-      'mail' => FALSE,
-      'language override' => FALSE,
-    ];
+    $configuration = $configuration + ['mail' => FALSE];
 
     parent::__construct($configuration, $plugin_id, $plugin_definition, $logger, $entity_type_manager, $render, $message);
 

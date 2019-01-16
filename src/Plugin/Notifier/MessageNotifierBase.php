@@ -68,6 +68,7 @@ abstract class MessageNotifierBase extends PluginBase implements MessageNotifier
     $configuration += [
       'save on success' => TRUE,
       'save on fail' => FALSE,
+      'language override' => FALSE,
     ];
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
