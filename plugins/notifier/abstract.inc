@@ -74,7 +74,7 @@ abstract class MessageNotifierBase implements MessageNotifierInterface {
     $message = $this->message;
     $output = array();
     foreach ($this->plugin['view_modes'] as $view_mode => $value) {
-      $content = $message->buildContent($view_mode);
+      $content = $message->buildContent($view_mode, $message->language);
       $output[$view_mode] = render($content);
     }
     $result = $this->deliver($output);
