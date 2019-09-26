@@ -126,7 +126,7 @@ abstract class MessageNotifierBase implements MessageNotifierInterface {
           $wrapper->{$field_name}->set($output[$view_mode]);
         }
         else {
-          $format = $wrapper->type->{MESSAGE_FIELD_MESSAGE_TEXT}->get(0)->format->value();
+          $format = $wrapper->type()->{MESSAGE_FIELD_MESSAGE_TEXT}->get(0)->format->value();
           $wrapper->{$field_name}->set(array('value' => $output[$view_mode], 'format' => $format));
         }
       }
