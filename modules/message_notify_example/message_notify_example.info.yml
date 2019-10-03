@@ -1,0 +1,9 @@
+name: 'Message notify example'
+description: 'Message notify example'
+core: 8.x
+package: Message
+dependencies:
+  - drupal:message
+  - drupal:message_notify
+  - drupal:message_example
+type: module
