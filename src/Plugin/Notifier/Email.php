@@ -59,6 +59,7 @@ class Email extends MessageNotifierBase {
     $configuration += [
       'mail' => FALSE,
       'language override' => FALSE,
+      'from' => FALSE,
     ];
 
     parent::__construct($configuration, $plugin_id, $plugin_definition, $logger, $entity_type_manager, $render, $message);
@@ -96,6 +97,7 @@ class Email extends MessageNotifierBase {
     }
 
     $mail = $this->configuration['mail'] ?: $account->getEmail();
+    $from = $this->configuration['from'] ?: NULL;
 
     if (!$this->configuration['language override']) {
       $language = $account->getPreferredLangcode();
@@ -115,7 +117,8 @@ class Email extends MessageNotifierBase {
       $this->message->getTemplate()->id(),
       $mail,
       $language,
-      $output
+      $output,
+      $from
     );
 
     return $result['result'];
