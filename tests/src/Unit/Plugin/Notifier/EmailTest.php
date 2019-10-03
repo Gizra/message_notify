@@ -10,6 +10,7 @@ use Drupal\Core\Mail\MailManagerInterface;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\message\MessageInterface;
 use Drupal\message\MessageTemplateInterface;
+use Drupal\message_notify\Exception\MessageNotifyException;
 use Drupal\message_notify\Plugin\Notifier\Email;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\UserInterface;
@@ -116,11 +117,10 @@ class EmailTest extends UnitTestCase {
    * Test sending without a message.
    *
    * @covers ::send
-   *
-   * @expectedException \AssertionError
-   * @expectedExceptionMessage No message is set for this notifier.
    */
   public function testSendNoMessage() {
+    $this->expectException(\AssertionError::class);
+    $this->expectExceptionMessage('No message is set for this notifier.');
     $notifier = $this->getNotifier();
     $notifier->send();
   }
@@ -129,11 +129,10 @@ class EmailTest extends UnitTestCase {
    * Test sending without an email.
    *
    * @covers ::deliver
-   *
-   * @expectedException \Drupal\message_notify\Exception\MessageNotifyException
-   * @expectedExceptionMessage It is not possible to send a Message to an anonymous owner. You may set an owner using ::setOwner() or pass a "mail" to the $options array.
    */
   public function testSendNoEmail() {
+    $this->expectException(MessageNotifyException::class);
+    $this->expectExceptionMessage('It is not possible to send a Message to an anonymous owner. You may set an owner using ::setOwner() or pass a "mail" to the $options array.');
     $message = $this->prophesize(MessageInterface::class);
     $account = $this->prophesize(UserInterface::class)->reveal();
     $message->getOwner()->willReturn($account);
