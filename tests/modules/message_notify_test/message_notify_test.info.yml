@@ -1,8 +1,8 @@
-name: 'Message notify test module'
+name: 'Message Notify Test Module'
 description: 'Functionality to assist Message notify testing.'
 type: module
 core: 8.x
 dependencies:
-  - field
-  - message_notify
+  - drupal:field
+  - message_notify:message_notify
 package: Testing

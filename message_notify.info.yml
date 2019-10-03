@@ -3,5 +3,5 @@ description: 'Message notify.'
 core: 8.x
 package: Message
 dependencies:
-  - message
+  - message:message
 type: module
