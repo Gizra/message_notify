@@ -40,7 +40,13 @@ function message_notify_entity_bundle_create($entity_type_id, $bundle) {
 
   $storage = \Drupal::entityTypeManager()->getStorage('entity_view_display');
   /** @var \Drupal\Core\Entity\Display\EntityViewDisplayInterface $default */
-  $default = \Drupal::service('entity_display.repository')->getViewDisplay($entity_type_id, $bundle);
+  if (method_exists(\Drupal::service('entity_display.repository'), 'getViewDisplay')) {
+    $default = \Drupal::service('entity_display.repository')->getViewDisplay($entity_type_id, $bundle);
+  }
+  else {
+    // Pre-Drupal 8.8.
+    $default = entity_get_display($entity_type_id, $bundle, 'default');
+  }
 
   // Setup the subject/title display mode if it doesn't exist.
   if (!$storage->load($entity_type_id . '.' . $bundle . '.mail_subject')) {
