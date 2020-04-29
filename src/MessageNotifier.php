@@ -9,7 +9,7 @@ use Drupal\message_notify\Plugin\Notifier\Manager;
 /**
  * Prepare and send notifications.
  */
-class MessageNotifier {
+class MessageNotifier implements MessageNotifierInterface {
 
   /**
    * The notifier plugin manager.
@@ -29,21 +29,7 @@ class MessageNotifier {
   }
 
   /**
-   * Process and send a message.
-   *
-   * @param \Drupal\message\MessageInterface $message
-   *   The message entity being used for the notification.
-   * @param array $options
-   *   Array of options to override the plugin's default ones.
-   * @param string $notifier_name
-   *   Optional; The name of the notifier to use. Defaults to "email"
-   *   sending method.
-   *
-   * @return bool
-   *   Boolean value denoting success or failure of the notification.
-   *
-   * @throws \Drupal\message_notify\Exception\MessageNotifyException
-   *   If no matching notifier plugin exists.
+   * {@inheritdoc}
    */
   public function send(MessageInterface $message, array $options = [], $notifier_name = 'email') {
     if (!$this->notifierManager->hasDefinition($notifier_name, FALSE)) {
@@ -56,7 +42,6 @@ class MessageNotifier {
     if ($notifier->access()) {
       return $notifier->send();
     }
-    // @todo Throw exception instead?
     return FALSE;
   }
 
